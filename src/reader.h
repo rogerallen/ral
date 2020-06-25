@@ -24,7 +24,7 @@
 
 class Reader {
     std::vector<std::string> tokens_;
-    unsigned int position_;
+    size_t position_;
 
   public:
     Reader(std::vector<std::string> tokens);

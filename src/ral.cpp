@@ -135,8 +135,8 @@ MalTypePtr EVAL(MalTypePtr mp, MalEnvPtr env)
             // okay, instead of packaging up the items as a list & passing
             // them to eval_ast (which doesn't exist) I'll just do what
             // eval_ast would do which is EVAL each item. (but the last)
-            unsigned int size = lp->size();
-            unsigned int index = 1; // skip the "do"
+            size_t size = lp->size();
+            size_t index = 1; // skip the "do"
             MalTypePtr p0, p1;
             for (; index < size - 1; index++) {
                 p1 = EVAL(lp->get(index), env);
@@ -170,7 +170,7 @@ MalTypePtr EVAL(MalTypePtr mp, MalEnvPtr env)
             auto bindingList = std::static_pointer_cast<MalList>(bindings);
             auto form = lp->get(2);
             std::vector<MalTypePtr> bindStrs;
-            for (unsigned int i = 0; i < bindingList->size(); i++) {
+            for (size_t i = 0; i < bindingList->size(); i++) {
                 bindStrs.push_back(bindingList->get(i));
             }
             return std::make_shared<MalLambda>(bindStrs, form, env);
@@ -233,7 +233,7 @@ MalTypePtr EVAL(MalTypePtr mp, MalEnvPtr env)
                 auto lambda = elp->get(0);
                 mp = std::static_pointer_cast<MalLambda>(lambda)->form();
                 std::vector<MalTypePtr> rest;
-                for (unsigned int i = 1; i < elp->size(); i++) {
+                for (size_t i = 1; i < elp->size(); i++) {
                     rest.push_back(elp->get(i));
                 }
                 env = std::static_pointer_cast<MalLambda>(lambda)->makeEnv(rest.begin(), rest.end());
@@ -285,7 +285,7 @@ MalTypePtr quasiquote(MalTypePtr mp)
         list->add(concat);
         list->add(firstlp->get(1));
         auto rest = std::make_shared<MalList>('(');
-        for(unsigned int i = 1; i < lp->size(); i++) {
+        for(size_t i = 1; i < lp->size(); i++) {
             rest->add(lp->get(i));
         }
         list->add(quasiquote(rest));
@@ -303,7 +303,7 @@ MalTypePtr quasiquote(MalTypePtr mp)
         list->add(cons);
         list->add(quasiquote(first));
         auto rest = std::make_shared<MalList>('(');
-        for(unsigned int i = 1; i < lp->size(); i++) {
+        for(size_t i = 1; i < lp->size(); i++) {
             rest->add(lp->get(i));
         }
         list->add(quasiquote(rest));
@@ -329,7 +329,7 @@ MalTypePtr macroexpand(MalTypePtr ast, MalEnvPtr env)
         auto func = std::static_pointer_cast<MalLambda>(symbol->eval(env));
         auto funclist = std::make_shared<MalList>('(');
         funclist->add(func);
-        for(unsigned int i = 1; i < listp->size(); i++) {
+        for(size_t i = 1; i < listp->size(); i++) {
             funclist->add(listp->get(i));
         }
         ast = apply(funclist);
@@ -377,13 +377,14 @@ void setup_repl_env(std::vector<std::string> args)
     repl_env->set("eval", mal_eval);
     // add commandline arguments
     MalTypePtr argslist = std::make_shared<MalList>('(');
-    for (unsigned int i = 1; i < args.size(); i++) {
+    for (size_t i = 1; i < args.size(); i++) {
         MalTypePtr sp = std::make_shared<MalString>(args[i]);
         std::static_pointer_cast<MalList>(argslist)->add(sp);
     }
     repl_env->set("*ARGV*", argslist);
     repl_env->set("*host-language*", std::make_shared<MalString>("C++"));
     repl_env->set("*version*", std::make_shared<MalString>(RAL_VERSION));
+    repl_env->set("*build-type*", std::make_shared<MalString>(RAL_BUILD_TYPE));
     // add some functions
     rep("(def! not (fn* (a) (if a false true)))", repl_env);
     rep("(def! load-file (fn* (f) (eval (read-string (str \"(do \" (slurp f) \"\nnil)\")))))", repl_env);
@@ -460,7 +461,7 @@ int main(int argc, char *argv[])
     }
     else {
         DBG << "REPL\n";
-        rep("(println (str \"ral v.\" *version* ))", repl_env);
+        rep("(println (str \"ral v.\" *version* \" \" *build-type*))", repl_env);
         const auto path = "history.txt";
         linenoise::SetCompletionCallback(completion);
         linenoise::SetMultiLine(true);

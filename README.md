@@ -4,7 +4,7 @@ I Made a Lisp based on https://github.com/kanaka/mal
 
 There are many others like it, but this one is mine.
 
-# License
+## License
 
 Copyright (C) 2020 Roger Allen
 
@@ -21,14 +21,14 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-## Uses aixlog.hpp
+### Uses aixlog.hpp
 
 https://github.com/badaix/aixlog
 Copyright (C) 2017-2020 Johannes Pohl
 This software may be modified and distributed under the terms
 of the MIT license.  See the LICENSE file for details.
 
-## Uses linenoise.hpp
+### Uses linenoise.hpp
 
 https://github.com/yhirose/cpp-linenoise
 All credits and commendations have to go to the authors of the

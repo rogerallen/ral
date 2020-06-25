@@ -2,7 +2,7 @@
 step2_eval
 ============================================================
 Started with:
-ral v.0.1
+ral v.0.1 Debug
 
 Testing evaluation of arithmetic operations
 TEST: '(+ 1 2)' -> ['',3] -> SUCCESS
@@ -35,7 +35,7 @@ TEST RESULTS (for ./step2_eval.mal):
 step3_env
 ============================================================
 Started with:
-ral v.0.1
+ral v.0.1 Debug
 
 Testing REPL_ENV
 TEST: '(+ 1 2)' -> ['',3] -> SUCCESS
@@ -89,7 +89,7 @@ TEST RESULTS (for ./step3_env.mal):
 step4_if_fn_do
 ============================================================
 Started with:
-ral v.0.1
+ral v.0.1 Debug
 
 -----------------------------------------------------
 Testing list functions
@@ -310,7 +310,7 @@ TEST RESULTS (for ./step4_if_fn_do.mal):
 step5_tco
 ============================================================
 Started with:
-ral v.0.1
+ral v.0.1 Debug
 
 Testing recursive tail-call function
 TEST: '(def! sum2 (fn* (n acc) (if (= n 0) acc (sum2 (- n 1) (+ n acc)))))' -> ['',] -> SUCCESS (result ignored)
@@ -334,7 +334,7 @@ TEST RESULTS (for ./step5_tco.mal):
 step6_file
 ============================================================
 Started with:
-ral v.0.1
+ral v.0.1 Debug
 
 
 Testing that (do (do)) not broken by TCO
@@ -508,7 +508,7 @@ TEST RESULTS (for ./step6_file.mal):
 step7_quote
 ============================================================
 Started with:
-ral v.0.1
+ral v.0.1 Debug
 
 Testing cons function
 TEST: '(cons 1 (list))' -> ['',(1)] -> SUCCESS
@@ -608,7 +608,7 @@ TEST RESULTS (for ./step7_quote.mal):
 step8_macros
 ============================================================
 Started with:
-ral v.0.1
+ral v.0.1 Debug
 
 Testing trivial macros
 TEST: '(defmacro! one (fn* () 1))' -> ['',] -> SUCCESS (result ignored)
@@ -694,7 +694,7 @@ TEST RESULTS (for ./step8_macros.mal):
 step9_try
 ============================================================
 Started with:
-ral v.0.1
+ral v.0.1 Debug
 
 
 Testing throw
@@ -886,7 +886,7 @@ TEST RESULTS (for ./step9_try.mal):
 stepA_mal
 ============================================================
 Started with:
-ral v.0.1
+ral v.0.1 Debug
 
 
 Testing readline

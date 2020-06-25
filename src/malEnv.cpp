@@ -33,7 +33,7 @@ MalEnv::MalEnv(MalEnvPtr outer, std::vector<MalTypePtr> &binds, std::vector<MalT
 {
     outer_ = outer;
     bool varArgMode = false;
-    unsigned int i = 0;
+    size_t i = 0;
     for (auto mp : binds) {
         if(!varArgMode) {
             if(mp->str(false) == "&") {

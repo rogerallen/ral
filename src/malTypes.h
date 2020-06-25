@@ -52,7 +52,7 @@ class MalType {
     // only some types implement the below functions
     virtual MalTypePtr apply(MalTypeIter begin, MalTypeIter end); // NOT pure virtual
     virtual std::string asMapKey();                               // NOT pure virtual
-    virtual int asInt();                                          // NOT pure virtual
+    virtual int64_t asInt();                                          // NOT pure virtual
     virtual bool isNilOrFalse();                                  // NOT pure virtual
     virtual MalTypePtr getMeta();                                 // NOT pure virtual
     virtual void setMeta(MalTypePtr meta);                        // NOT pure virtual
@@ -72,14 +72,14 @@ class MalInteger : public MalType {
 
   public:
     MalInteger(std::string s);
-    MalInteger(int i);
+    MalInteger(int64_t i);
     MalInteger(MalInteger *that);
     ~MalInteger() override;
     MalKind kind() override { return MalKind::INTEGER; }
     std::string str(bool readable) override;
     MalTypePtr eval(MalEnvPtr env) override;
     bool equal(MalTypePtr that) override;
-    int asInt() override;
+    int64_t asInt() override;
 };
 
 // ================================================================================
@@ -94,7 +94,7 @@ class MalConstant : public MalType {
     std::string str(bool readable) override;
     MalTypePtr eval(MalEnvPtr env) override;
     bool equal(MalTypePtr that) override;
-    int asInt() override;
+    int64_t asInt() override;
     bool isNilOrFalse() override;
 };
 
@@ -170,7 +170,7 @@ class MalList : public MalType {
     void setEnv(MalEnvPtr env) override;
     virtual bool is_macro_call(MalEnvPtr env) override;
     MalTypePtr doList(MalEnvPtr env);
-    MalTypePtr get(unsigned int i);
+    MalTypePtr get(size_t i);
     size_t size();
     MalTypePtr getMeta() override;
     void setMeta(MalTypePtr meta) override;

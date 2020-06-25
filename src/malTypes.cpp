@@ -44,7 +44,7 @@ MalTypePtr MalType::apply(MalTypeIter begin, MalTypeIter end) {
 // ================================================================================
 // when using MalType for arithmentic, use this function to get the value.
 // Only integer will override this an implement it.
-int MalType::asInt() {
+int64_t MalType::asInt() {
     throw MalNoIntegerRepresentation();
 }
 
@@ -83,7 +83,7 @@ MalInteger::MalInteger(std::string s)
     value_ = std::stoi(s);
 }
 
-MalInteger::MalInteger(int i)
+MalInteger::MalInteger(int64_t i)
 {
     repr_ = std::to_string(i);
     value_ = i;
@@ -115,7 +115,7 @@ bool MalInteger::equal(MalTypePtr that)
     return value_ == b->asInt();
 }
 
-int MalInteger::asInt() {
+int64_t MalInteger::asInt() {
     return value_;
 }
 
@@ -150,7 +150,7 @@ bool MalConstant::equal(MalTypePtr that)
     return repr_ == b->str(false);
 }
 
-int MalConstant::asInt()
+int64_t MalConstant::asInt()
 {
     if(repr_ == "nil") {
         return 0;
@@ -215,7 +215,7 @@ std::string transformToPrintable(std::string s)
 {
     // drop the quotes
     std::string r;
-    for(unsigned int i = 1; i < s.length() - 1; i++) {
+    for(size_t i = 1; i < s.length() - 1; i++) {
         if(s[i] == '\\') {
             if((i + 1 >= s.length() - 1) ||
                !((s[i+1] == '\"') || (s[i+1] == 'n') || (s[i+1] == '\\'))) {
@@ -242,7 +242,7 @@ std::string transformToPrintable(std::string s)
 std::string transformToReadable(std::string s)
 {
     std::string r;
-    for(unsigned int i = 0; i < s.length(); i++) {
+    for(size_t i = 0; i < s.length(); i++) {
         switch(s[i]) {
         case '\\':
             r += "\\\\";
@@ -405,7 +405,7 @@ MalTypePtr MalList::eval(MalEnvPtr env)
     return mp;
 }
 
-MalTypePtr MalList::get(unsigned int i)
+MalTypePtr MalList::get(size_t i)
 {
     if(values_.size() > i) {
         return values_[i]; 
@@ -420,7 +420,7 @@ bool MalList::equal(MalTypePtr that)
     auto b = std::static_pointer_cast<MalList>(that);
     bool result = false;
     if(size() == b->size()) {
-        unsigned int i = 0; 
+        size_t i = 0; 
         for(;i < values_.size(); i++ ) {
             auto ai = values_[i];
             auto bi = b->get(i);
@@ -455,8 +455,8 @@ void MalList::add(MalTypePtr mp)
 
 MalTypePtr MalList::count()
 {
-    int n = values_.size();
-    return std::make_shared<MalInteger>(n);
+    size_t n = values_.size();
+    return std::make_shared<MalInteger>((int64_t)n);
 }
 
 bool MalList::isList() { return listStartChar_ == '('; }

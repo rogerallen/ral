@@ -20,6 +20,7 @@
 #include "printer.h"
 #include "reader.h"
 #include <chrono>
+#include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -102,7 +103,7 @@ const std::map<std::string, MalFunctionSignature> MalCore::ns = {
 // CHECKS
 // ================================================================================
 
-void checkArgsEqual(const char *name, int expected, int num)
+void checkArgsEqual(const char *name, size_t expected, size_t num)
 {
     if (expected != num) {
         std::ostringstream errSS;
@@ -111,7 +112,7 @@ void checkArgsEqual(const char *name, int expected, int num)
     }
 }
 #if 0
-void checkArgsBetween(const char* name, int min, int max, int num) 
+void checkArgsBetween(const char* name, size_t min, size_t max, size_t num) 
 {
     if((num < min) || (num > max)) {
         std::ostringstream errSS;
@@ -121,7 +122,7 @@ void checkArgsBetween(const char* name, int min, int max, int num)
     }
 }
 #endif
-void checkArgsAtLeast(const char *name, int min, int num)
+void checkArgsAtLeast(const char *name, size_t min, size_t num)
 {
     if (num < min) {
         std::ostringstream errSS;
@@ -129,7 +130,7 @@ void checkArgsAtLeast(const char *name, int min, int num)
         throw MalException(errSS.str());
     }
 }
-void checkArgsEven(const char *name, int num)
+void checkArgsEven(const char *name, size_t num)
 {
     if (num % 2 != 0) {
         std::ostringstream errSS;
@@ -137,7 +138,7 @@ void checkArgsEven(const char *name, int num)
         throw MalException(errSS.str());
     }
 }
-void checkArgsOdd(const char *name, int num)
+void checkArgsOdd(const char *name, size_t num)
 {
     if (num % 2 != 1) {
         std::ostringstream errSS;
@@ -153,7 +154,7 @@ MalTypePtr mal_add(MalTypeIter begin, MalTypeIter end)
 {
     checkArgsAtLeast("+", 1, std::distance(begin, end));
     MalTypeIter iter = begin;
-    int value = (**(iter++)).asInt();
+    int64_t value = (**(iter++)).asInt();
     for (; iter != end;) {
         value += (**(iter++)).asInt();
     }
@@ -166,7 +167,7 @@ MalTypePtr mal_sub(MalTypeIter begin, MalTypeIter end)
 {
     checkArgsAtLeast("-", 1, std::distance(begin, end));
     MalTypeIter iter = begin;
-    int value = (**(iter++)).asInt();
+    int64_t value = (**(iter++)).asInt();
     if (iter == end) {
         value = -value;
     }
@@ -184,7 +185,7 @@ MalTypePtr mal_mul(MalTypeIter begin, MalTypeIter end)
 {
     checkArgsAtLeast("*", 1, std::distance(begin, end));
     MalTypeIter iter = begin;
-    int value = (**(iter++)).asInt();
+    int64_t value = (**(iter++)).asInt();
     for (; iter != end;) {
         value *= (**(iter++)).asInt();
     }
@@ -197,7 +198,7 @@ MalTypePtr mal_div(MalTypeIter begin, MalTypeIter end)
 {
     checkArgsAtLeast("/", 1, std::distance(begin, end));
     MalTypeIter iter = begin;
-    int value = (**(iter++)).asInt();
+    int64_t value = (**(iter++)).asInt();
     for (; iter != end;) {
         value /= (**(iter++)).asInt();
     }
@@ -263,8 +264,8 @@ MalTypePtr mal_lt(MalTypeIter begin, MalTypeIter end)
 {
     checkArgsEqual("<", 2, std::distance(begin, end));
     MalTypeIter iter = begin;
-    int a = (*iter++)->asInt();
-    int b = (*iter)->asInt();
+    int64_t a = (*iter++)->asInt();
+    int64_t b = (*iter)->asInt();
     return (a < b) ? std::make_shared<MalConstant>("true") : std::make_shared<MalConstant>("false");
 }
 
@@ -273,8 +274,8 @@ MalTypePtr mal_le(MalTypeIter begin, MalTypeIter end)
 {
     checkArgsEqual("<=", 2, std::distance(begin, end));
     MalTypeIter iter = begin;
-    int a = (*iter++)->asInt();
-    int b = (*iter)->asInt();
+    int64_t a = (*iter++)->asInt();
+    int64_t b = (*iter)->asInt();
     return (a <= b) ? std::make_shared<MalConstant>("true") : std::make_shared<MalConstant>("false");
 }
 
@@ -283,8 +284,8 @@ MalTypePtr mal_gt(MalTypeIter begin, MalTypeIter end)
 {
     checkArgsEqual(">", 2, std::distance(begin, end));
     MalTypeIter iter = begin;
-    int a = (*iter++)->asInt();
-    int b = (*iter)->asInt();
+    int64_t a = (*iter++)->asInt();
+    int64_t b = (*iter)->asInt();
     return (a > b) ? std::make_shared<MalConstant>("true") : std::make_shared<MalConstant>("false");
 }
 
@@ -293,8 +294,8 @@ MalTypePtr mal_ge(MalTypeIter begin, MalTypeIter end)
 {
     checkArgsEqual(">=", 2, std::distance(begin, end));
     MalTypeIter iter = begin;
-    int a = (*iter++)->asInt();
-    int b = (*iter)->asInt();
+    int64_t a = (*iter++)->asInt();
+    int64_t b = (*iter)->asInt();
     return (a >= b) ? std::make_shared<MalConstant>("true") : std::make_shared<MalConstant>("false");
 }
 
@@ -457,8 +458,8 @@ MalTypePtr mal_cons(MalTypeIter begin, MalTypeIter end)
     auto list = *(iter++);
     auto cons = std::make_shared<MalList>('(');
     std::static_pointer_cast<MalList>(cons)->add(first);
-    unsigned int size = std::static_pointer_cast<MalList>(list)->size();
-    for (unsigned int i = 0; i < size; i++) {
+    size_t size = std::static_pointer_cast<MalList>(list)->size();
+    for (size_t i = 0; i < size; i++) {
         auto item = std::static_pointer_cast<MalList>(list)->get(i);
         std::static_pointer_cast<MalList>(cons)->add(item);
     }
@@ -472,7 +473,7 @@ MalTypePtr mal_concat(MalTypeIter begin, MalTypeIter end)
     auto list = std::make_shared<MalList>('(');
     for (auto iter = begin; iter != end; iter++) {
         auto listparam = std::static_pointer_cast<MalList>(*iter);
-        for (unsigned int i = 0; i < listparam->size(); i++) {
+        for (size_t i = 0; i < listparam->size(); i++) {
             auto item = listparam->get(i);
             std::static_pointer_cast<MalList>(list)->add(item);
         }
@@ -523,8 +524,8 @@ MalTypePtr mal_rest(MalTypeIter begin, MalTypeIter end)
     auto arg = *begin;
     auto rest = std::make_shared<MalList>('(');
     if (arg->kind() == MalKind::LIST) {
-        unsigned int size = std::static_pointer_cast<MalList>(arg)->size();
-        for (unsigned int i = 1; i < size; i++) {
+        size_t size = std::static_pointer_cast<MalList>(arg)->size();
+        for (size_t i = 1; i < size; i++) {
             auto item = std::static_pointer_cast<MalList>(arg)->get(i);
             std::static_pointer_cast<MalList>(rest)->add(item);
         }
@@ -560,13 +561,13 @@ MalTypePtr mal_apply(MalTypeIter begin, MalTypeIter end)
     auto middle_size = end - begin - 2;
     if (middle_size > 0) {
         // create one list from items + final list
-        for (uint i = 0; i < middle_size; i++) {
+        for (size_t i = 0; i < middle_size; i++) {
             std::static_pointer_cast<MalList>(fn_list)->add(*iter++);
         }
     }
     // add params in the final list
     auto last = *iter++;
-    for (uint i = 0; i < std::static_pointer_cast<MalList>(last)->size(); i++) {
+    for (size_t i = 0; i < std::static_pointer_cast<MalList>(last)->size(); i++) {
         auto item = std::static_pointer_cast<MalList>(last)->get(i);
         std::static_pointer_cast<MalList>(fn_list)->add(item);
     }
@@ -586,7 +587,7 @@ MalTypePtr mal_map(MalTypeIter begin, MalTypeIter end)
     auto list = *iter++;
     auto result = std::make_shared<MalList>('(');
     auto num_items = std::static_pointer_cast<MalList>(list)->size();
-    for (uint i = 0; i < num_items; i++) {
+    for (size_t i = 0; i < num_items; i++) {
         auto fn_list = std::make_shared<MalList>('(');
         std::static_pointer_cast<MalList>(fn_list)->add(fn);
         auto item = std::static_pointer_cast<MalList>(list)->get(i);
@@ -831,7 +832,7 @@ MalTypePtr mal_readline(MalTypeIter begin, MalTypeIter end)
 MalTypePtr mal_time_ms(MalTypeIter begin, MalTypeIter end)
 {
     
-    uint t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+    size_t t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     return std::make_shared<MalInteger>(t);
 }
 
@@ -927,7 +928,7 @@ MalTypePtr mal_seq(MalTypeIter begin, MalTypeIter end)
         }
         else if(ml->isVector()) {
             MalTypePtr mp = std::make_shared<MalList>('(');
-            for (uint i = 0; i < ml->size(); i++) {
+            for (size_t i = 0; i < ml->size(); i++) {
                 std::static_pointer_cast<MalList>(mp)->add(ml->get(i));
             }
             return mp;
@@ -974,7 +975,7 @@ MalTypePtr mal_conj(MalTypeIter begin, MalTypeIter end)
         auto ml = std::static_pointer_cast<MalList>(first);
         if(ml->isVector()) {
             MalTypePtr mp = std::make_shared<MalList>('[');
-            for (uint i = 0; i < ml->size(); i++) {
+            for (size_t i = 0; i < ml->size(); i++) {
                 std::static_pointer_cast<MalList>(mp)->add(ml->get(i));
             }
             for(; iter != end; iter++) {
@@ -992,7 +993,7 @@ MalTypePtr mal_conj(MalTypeIter begin, MalTypeIter end)
                 std::static_pointer_cast<MalList>(mp)->add(*iter);
             }
             // then add the original list
-                        for (uint i = 0; i < ml->size(); i++) {
+            for (size_t i = 0; i < ml->size(); i++) {
                 std::static_pointer_cast<MalList>(mp)->add(ml->get(i));
             }
             return mp;

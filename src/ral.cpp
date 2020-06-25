@@ -22,6 +22,7 @@
 #include "malTypes.h"
 #include "printer.h"
 #include "reader.h"
+#include "version.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -381,7 +382,8 @@ void setup_repl_env(std::vector<std::string> args)
         std::static_pointer_cast<MalList>(argslist)->add(sp);
     }
     repl_env->set("*ARGV*", argslist);
-    repl_env->set("*host-language*", std::make_shared<MalString>("rog C++"));
+    repl_env->set("*host-language*", std::make_shared<MalString>("C++"));
+    repl_env->set("*version*", std::make_shared<MalString>(RAL_VERSION));
     // add some functions
     rep("(def! not (fn* (a) (if a false true)))", repl_env);
     rep("(def! load-file (fn* (f) (eval (read-string (str \"(do \" (slurp f) \"\nnil)\")))))", repl_env);
@@ -458,7 +460,7 @@ int main(int argc, char *argv[])
     }
     else {
         DBG << "REPL\n";
-        rep("(println (str \"Mal [\" *host-language* \"]\"))", repl_env);
+        rep("(println (str \"ral v.\" *version* ))", repl_env);
         const auto path = "history.txt";
         linenoise::SetCompletionCallback(completion);
         linenoise::SetMultiLine(true);

@@ -2,3 +2,4 @@
 build/
 history.txt
 *.log
+src/version.h

@@ -1,5 +1,5 @@
 // ======================================================================
-// ral - Roger Allen's Lisp via https://github.com/kanaka/ral
+// ral - Roger Allen's Lisp via https://github.com/kanaka/mal
 // Copyright(C) 2020 Roger Allen
 // 
 // This program is free software : you can redistribute it and/or modify

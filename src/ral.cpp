@@ -35,7 +35,7 @@ RalTypePtr EVAL(RalTypePtr mp, RalEnvPtr env);
 std::string PRINT(RalTypePtr mp);
 RalTypePtr apply(RalTypePtr mp);
 std::string rep(std::string s, RalEnvPtr env);
-RalTypePtr mal_eval(RalTypeIter begin, RalTypeIter end);
+RalTypePtr ral_eval(RalTypeIter begin, RalTypeIter end);
 void setup_repl_env(std::vector<std::string> args);
 bool is_pair(RalTypePtr lp);
 RalTypePtr quasiquote(RalTypePtr mp);
@@ -43,7 +43,7 @@ RalTypePtr macroexpand(RalTypePtr ast, RalEnvPtr env);
 void completion(const char* editBuffer, std::vector<std::string>& completions);
 
 
-// made this a global for mal_eval()
+// made this a global for ral_eval()
 // FIXME -- maybe there should be a class that has this and
 // also the REPL?  spawn separate threads with different (or shared)
 // environments
@@ -189,14 +189,14 @@ RalTypePtr EVAL(RalTypePtr mp, RalEnvPtr env)
         // (try* A (catch* B C))
         // Add a (native language) try/catch block that evaluates A within the 
         // try block and catches all exceptions. If an exception is caught, 
-        // then translate it to a mal type/value. For native exceptions this 
-        // is either the message string or a mal hash-map that contains the 
+        // then translate it to a ral type/value. For native exceptions this 
+        // is either the message string or a ral hash-map that contains the 
         // message string and other attributes of the exception. When a regular 
-        // mal type/value is used as an exception, you will probably need to 
+        // ral type/value is used as an exception, you will probably need to 
         // store it within a native exception type in order to be able to 
         // convey/transport it using the native try/catch mechanism. Then you 
-        // will extract the mal type/value from the native exception. Create a 
-        // mal environment that binds B to the value of the exception. 
+        // will extract the ral type/value from the native exception. Create a 
+        // ral environment that binds B to the value of the exception. 
         // Finally, evaluate C using that new environment.
         else if(first == "try*") {
             try {
@@ -361,8 +361,8 @@ std::string rep(std::string s, RalEnvPtr env)
 }
 
 // ================================================================================
-// FIXME -- move mal_eval into malCore (eval-with-env form env)?  make eval special form?
-RalTypePtr mal_eval(RalTypeIter begin, RalTypeIter end)
+// FIXME -- move ral_eval into ralCore (eval-with-env form env)?  make eval special form?
+RalTypePtr ral_eval(RalTypeIter begin, RalTypeIter end)
 {
     return EVAL(*begin, repl_env);
 }
@@ -375,7 +375,7 @@ void setup_repl_env(std::vector<std::string> args)
         repl_env->set(kv.first, kv.second);
     }
     // add eval
-    repl_env->set("eval", mal_eval);
+    repl_env->set("eval", ral_eval);
     // add commandline arguments
     RalTypePtr argslist = std::make_shared<RalList>('(');
     for (size_t i = 1; i < args.size(); i++) {

@@ -17,8 +17,8 @@
 // ======================================================================
 #pragma once
 
-#include "malEnv.h"
-#include "malTypes.h"
+#include "env.h"
+#include "types.h"
 #include <map>
 #include <string>
 

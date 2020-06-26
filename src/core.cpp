@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 // ======================================================================
-#include "malCore.h"
+#include "core.h"
 #include "printer.h"
 #include "reader.h"
 #include <chrono>
@@ -390,7 +390,7 @@ MalTypePtr mal_slurp(MalTypeIter begin, MalTypeIter end)
     checkArgsEqual("slurp", 1, std::distance(begin, end));
     std::string filename = (*begin)->str(false);
     // https://stackoverflow.com/questions/524591/performance-of-creating-a-c-stdstring-from-an-input-iterator/524843#524843
-#if 0
+#if __linux__
     std::ifstream ifs(filename.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
     std::ifstream::pos_type fileSize = ifs.tellg();
     ifs.seekg(0, std::ios::beg);
@@ -400,6 +400,7 @@ MalTypePtr mal_slurp(MalTypeIter begin, MalTypeIter end)
     ifs.read(&bytes[0], fileSize);
     std::string s = std::string(&bytes[0], fileSize);
 #else
+    // FIXME -test this on windows (load-file "../tests/computations.mal")
     // alternate that is less performant, but does not cause Visual Studio error
     std::ifstream f(filename.c_str());
     std::string s = std::string(std::istreambuf_iterator<char>(f), std::istreambuf_iterator<char>());

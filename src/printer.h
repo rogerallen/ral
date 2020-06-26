@@ -17,7 +17,7 @@
 // ======================================================================
 #pragma once
 
-#include "malTypes.h"
+#include "types.h"
 
 #include <string>
 

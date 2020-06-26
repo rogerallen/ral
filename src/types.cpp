@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 // ======================================================================
-#include "malTypes.h"
-#include "malEnv.h"
+#include "types.h"
+#include "env.h"
 
 #if 1
 #include "aixlog.hpp"

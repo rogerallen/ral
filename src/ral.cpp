@@ -17,9 +17,9 @@
 // ======================================================================
 #include "aixlog.hpp"
 #include "linenoise.hpp"
-#include "malCore.h"
-#include "malEnv.h"
-#include "malTypes.h"
+#include "core.h"
+#include "env.h"
+#include "types.h"
 #include "printer.h"
 #include "reader.h"
 #include "version.h"

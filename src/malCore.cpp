@@ -558,10 +558,10 @@ MalTypePtr mal_apply(MalTypeIter begin, MalTypeIter end)
     // add the fn
     std::static_pointer_cast<MalList>(fn_list)->add(*iter++);
     // add any params in the middle
-    long middle_size = end - begin - 2;
+    int64_t middle_size = end - begin - 2;
     if (middle_size > 0) {
         // create one list from items + final list
-        for (long i = 0; i < middle_size; i++) {
+        for (int64_t i = 0; i < middle_size; i++) {
             std::static_pointer_cast<MalList>(fn_list)->add(*iter++);
         }
     }

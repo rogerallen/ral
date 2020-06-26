@@ -32,8 +32,8 @@ class Reader {
     std::string peek();
 };
 
-MalTypePtr read_str(std::string s);
-MalTypePtr read_form(Reader &r);
-MalTypePtr read_list(Reader &r, char listStartChar);
-MalTypePtr read_atom(Reader &r);
+RalTypePtr read_str(std::string s);
+RalTypePtr read_form(Reader &r);
+RalTypePtr read_list(Reader &r, char listStartChar);
+RalTypePtr read_atom(Reader &r);
 std::vector<std::string> tokenize(std::string s);

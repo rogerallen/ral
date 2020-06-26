@@ -21,4 +21,4 @@
 
 #include <string>
 
-std::string pr_str(MalTypePtr m, bool print_readably);
+std::string pr_str(RalTypePtr m, bool print_readably);

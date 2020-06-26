@@ -16,7 +16,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 // ======================================================================
 #include "printer.h"
-std::string pr_str(MalTypePtr m, bool print_readably)
+std::string pr_str(RalTypePtr m, bool print_readably)
 {
     return m->str(print_readably);
 }

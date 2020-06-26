@@ -25,16 +25,16 @@
 
 // ================================================================================
 // Environment
-typedef std::shared_ptr<MalEnv> MalEnvPtr;
+typedef std::shared_ptr<RalEnv> RalEnvPtr;
 
-class MalEnv : public std::enable_shared_from_this<MalEnv> {
-    MalEnvPtr outer_;
-    std::map<std::string,MalTypePtr> data_;
+class RalEnv : public std::enable_shared_from_this<RalEnv> {
+    RalEnvPtr outer_;
+    std::map<std::string,RalTypePtr> data_;
 public:
-    MalEnv();
-    MalEnv(MalEnvPtr outer, std::vector<MalTypePtr> &binds, std::vector<MalTypePtr> &exprs);
-    void set(std::string name, MalFunctionSignature fn);
-    void set(std::string name, MalTypePtr fn);
-    MalEnvPtr find(std::string name);
-    MalTypePtr get(std::string name);
+    RalEnv();
+    RalEnv(RalEnvPtr outer, std::vector<RalTypePtr> &binds, std::vector<RalTypePtr> &exprs);
+    void set(std::string name, RalFunctionSignature fn);
+    void set(std::string name, RalTypePtr fn);
+    RalEnvPtr find(std::string name);
+    RalTypePtr get(std::string name);
 };

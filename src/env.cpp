@@ -24,12 +24,12 @@ extern bool gDebug;
 //#include <iostream>
 
 // ================================================================================
-MalEnv::MalEnv()
+RalEnv::RalEnv()
 {
     outer_ = nullptr;
 }
 
-MalEnv::MalEnv(MalEnvPtr outer, std::vector<MalTypePtr> &binds, std::vector<MalTypePtr> &exprs)
+RalEnv::RalEnv(RalEnvPtr outer, std::vector<RalTypePtr> &binds, std::vector<RalTypePtr> &exprs)
 {
     outer_ = outer;
     bool varArgMode = false;
@@ -46,9 +46,9 @@ MalEnv::MalEnv(MalEnvPtr outer, std::vector<MalTypePtr> &binds, std::vector<MalT
             }
         }
         else {
-            MalTypePtr lp = std::make_shared<MalList>('(');
+            RalTypePtr lp = std::make_shared<RalList>('(');
             while(i < exprs.size()) {
-                std::static_pointer_cast<MalList>(lp)->add(exprs[i++]);
+                std::static_pointer_cast<RalList>(lp)->add(exprs[i++]);
             }
             DBG << "env_bind: " << mp->str(false) << " = " << lp->str(true) << "\n";
             data_[mp->str(false)] = lp;
@@ -58,20 +58,20 @@ MalEnv::MalEnv(MalEnvPtr outer, std::vector<MalTypePtr> &binds, std::vector<MalT
 
 // ================================================================================
 // special setter for functions
-void MalEnv::set(std::string name, MalFunctionSignature fn)
+void RalEnv::set(std::string name, RalFunctionSignature fn)
 {
-    set(name, std::make_shared<MalFunction>(name, fn));
+    set(name, std::make_shared<RalFunction>(name, fn));
 }
 
 // ================================================================================
-void MalEnv::set(std::string name, MalTypePtr mp)
+void RalEnv::set(std::string name, RalTypePtr mp)
 {
     DBG << "env_set: " << name << " = " << mp->str(true) << "\n";
     data_[name] = mp;
 }
 
 // ================================================================================
-MalEnvPtr MalEnv::find(std::string name)
+RalEnvPtr RalEnv::find(std::string name)
 {
     auto it = data_.find(name);
     if (it == data_.end()) {
@@ -87,7 +87,7 @@ MalEnvPtr MalEnv::find(std::string name)
     return shared_from_this();
 }
 // ================================================================================
-MalTypePtr MalEnv::get(std::string name)
+RalTypePtr RalEnv::get(std::string name)
 {
     // using find() for this is harder than just recursive get
     auto it = data_.find(name);
@@ -97,7 +97,7 @@ MalTypePtr MalEnv::get(std::string name)
             return outer_->get(name);
         }
         else {
-            throw MalNotInEnvironment(name);
+            throw RalNotInEnvironment(name);
         }
     }
     return (*it).second;

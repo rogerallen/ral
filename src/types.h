@@ -25,7 +25,7 @@
 #include <vector>
 
 // ================================================================================
-enum class MalKind {
+enum class RalKind {
     NONE,
     INTEGER,
     CONSTANT,
@@ -38,282 +38,282 @@ enum class MalKind {
     LAMBDA,
     ATOM
 };
-class MalType;
-class MalEnv;
-typedef std::shared_ptr<MalEnv> MalEnvPtr;
-typedef std::shared_ptr<MalType> MalTypePtr;
-typedef std::vector<MalTypePtr>::iterator MalTypeIter;
-class MalType {
+class RalType;
+class RalEnv;
+typedef std::shared_ptr<RalEnv> RalEnvPtr;
+typedef std::shared_ptr<RalType> RalTypePtr;
+typedef std::vector<RalTypePtr>::iterator RalTypeIter;
+class RalType {
   public:
-    virtual ~MalType(){};                       // remember to create a virtual destructor if you have virtual methods
-    virtual MalKind kind() = 0;                 // pure virtual
+    virtual ~RalType(){};                       // remember to create a virtual destructor if you have virtual methods
+    virtual RalKind kind() = 0;                 // pure virtual
     virtual std::string str(bool readable) = 0; // pure virtual
-    virtual MalTypePtr eval(MalEnvPtr env) = 0; // pure virtual
-    virtual bool equal(MalTypePtr that) = 0;   // pure virtual
+    virtual RalTypePtr eval(RalEnvPtr env) = 0; // pure virtual
+    virtual bool equal(RalTypePtr that) = 0;   // pure virtual
     // only some types implement the below functions
-    virtual MalTypePtr apply(MalTypeIter begin, MalTypeIter end); // NOT pure virtual
+    virtual RalTypePtr apply(RalTypeIter begin, RalTypeIter end); // NOT pure virtual
     virtual std::string asMapKey();                               // NOT pure virtual
     virtual int64_t asInt();                                          // NOT pure virtual
     virtual bool isNilOrFalse();                                  // NOT pure virtual
-    virtual MalTypePtr getMeta();                                 // NOT pure virtual
-    virtual void setMeta(MalTypePtr meta);                        // NOT pure virtual
+    virtual RalTypePtr getMeta();                                 // NOT pure virtual
+    virtual void setMeta(RalTypePtr meta);                        // NOT pure virtual
     // only list methods below
     virtual bool isList();              // NOT pure virtual
     virtual bool isVector();            // NOT pure virtual
     virtual bool isEmptyList();         // NOT pure virtual
-    virtual MalTypePtr apply();         // NOT pure virtual
-    virtual void setEnv(MalEnvPtr env); // NOT pure virtual
-    virtual bool is_macro_call(MalEnvPtr env); // NOT pure virtual
+    virtual RalTypePtr apply();         // NOT pure virtual
+    virtual void setEnv(RalEnvPtr env); // NOT pure virtual
+    virtual bool is_macro_call(RalEnvPtr env); // NOT pure virtual
 };
 
 // ================================================================================
-class MalInteger : public MalType {
+class RalInteger : public RalType {
     std::string repr_;
     int64_t value_;
 
   public:
-    MalInteger(std::string s);
-    MalInteger(int64_t i);
-    MalInteger(MalInteger *that);
-    ~MalInteger() override;
-    MalKind kind() override { return MalKind::INTEGER; }
+    RalInteger(std::string s);
+    RalInteger(int64_t i);
+    RalInteger(RalInteger *that);
+    ~RalInteger() override;
+    RalKind kind() override { return RalKind::INTEGER; }
     std::string str(bool readable) override;
-    MalTypePtr eval(MalEnvPtr env) override;
-    bool equal(MalTypePtr that) override;
+    RalTypePtr eval(RalEnvPtr env) override;
+    bool equal(RalTypePtr that) override;
     int64_t asInt() override;
 };
 
 // ================================================================================
-class MalConstant : public MalType {
+class RalConstant : public RalType {
     std::string repr_;
 
   public:
-    MalConstant(std::string s);
-    MalConstant(MalConstant *that);
-    ~MalConstant() override;
-    MalKind kind() override { return MalKind::CONSTANT; }
+    RalConstant(std::string s);
+    RalConstant(RalConstant *that);
+    ~RalConstant() override;
+    RalKind kind() override { return RalKind::CONSTANT; }
     std::string str(bool readable) override;
-    MalTypePtr eval(MalEnvPtr env) override;
-    bool equal(MalTypePtr that) override;
+    RalTypePtr eval(RalEnvPtr env) override;
+    bool equal(RalTypePtr that) override;
     int64_t asInt() override;
     bool isNilOrFalse() override;
 };
 
 // ================================================================================
-class MalSymbol : public MalType {
+class RalSymbol : public RalType {
     std::string repr_;
 
   public:
-    MalSymbol(std::string s);
-    ~MalSymbol() override;
-    MalKind kind() override { return MalKind::SYMBOL; }
+    RalSymbol(std::string s);
+    ~RalSymbol() override;
+    RalKind kind() override { return RalKind::SYMBOL; }
     std::string str(bool readable) override;
-    MalTypePtr eval(MalEnvPtr env) override;
-    bool equal(MalTypePtr that) override;
+    RalTypePtr eval(RalEnvPtr env) override;
+    bool equal(RalTypePtr that) override;
 };
 
 // ================================================================================
 std::string transformToPrintable(std::string s);
 
-class MalString : public MalType {
+class RalString : public RalType {
     std::string repr_;
 
   public:
-    MalString(std::string s);
-    MalString(MalString *that);
-    ~MalString() override;
-    MalKind kind() override { return MalKind::STRING; }
+    RalString(std::string s);
+    RalString(RalString *that);
+    ~RalString() override;
+    RalKind kind() override { return RalKind::STRING; }
     std::string str(bool readable) override;
-    MalTypePtr eval(MalEnvPtr env) override;
-    bool equal(MalTypePtr that) override;
+    RalTypePtr eval(RalEnvPtr env) override;
+    bool equal(RalTypePtr that) override;
     std::string asMapKey() override;
 };
 
 // ================================================================================
-class MalKeyword : public MalType {
+class RalKeyword : public RalType {
     std::string repr_;
 
   public:
-    MalKeyword(std::string s);
-    MalKeyword(MalKeyword *that);
-    ~MalKeyword() override;
-    MalKind kind() override { return MalKind::KEYWORD; }
+    RalKeyword(std::string s);
+    RalKeyword(RalKeyword *that);
+    ~RalKeyword() override;
+    RalKind kind() override { return RalKind::KEYWORD; }
     std::string str(bool readable) override;
-    MalTypePtr eval(MalEnvPtr env) override;
-    bool equal(MalTypePtr that) override;
+    RalTypePtr eval(RalEnvPtr env) override;
+    bool equal(RalTypePtr that) override;
     std::string asMapKey() override;
 };
 
 // ================================================================================
-class MalList : public MalType {
+class RalList : public RalType {
   protected:
-    std::vector<MalTypePtr> values_;
+    std::vector<RalTypePtr> values_;
     char listStartChar_; // ( for list, [ for vector
-    MalTypePtr meta_;
+    RalTypePtr meta_;
     
     std::string listStartStr();
     std::string listEndStr();
 
   public:
-    MalList(char listStartChar);
-    MalList(std::shared_ptr<MalList> that);
-    ~MalList() override;
-    MalKind kind() override { return MalKind::LIST; }
+    RalList(char listStartChar);
+    RalList(std::shared_ptr<RalList> that);
+    ~RalList() override;
+    RalKind kind() override { return RalKind::LIST; }
     std::string str(bool readable) override;
-    MalTypePtr eval(MalEnvPtr env) override;
-    bool equal(MalTypePtr that) override;
-    MalTypePtr apply() override;
-    void add(MalTypePtr mp);
-    MalTypePtr count();
+    RalTypePtr eval(RalEnvPtr env) override;
+    bool equal(RalTypePtr that) override;
+    RalTypePtr apply() override;
+    void add(RalTypePtr mp);
+    RalTypePtr count();
     bool isList() override;
     bool isVector() override;
     bool isEmptyList() override;
-    void setEnv(MalEnvPtr env) override;
-    virtual bool is_macro_call(MalEnvPtr env) override;
-    MalTypePtr doList(MalEnvPtr env);
-    MalTypePtr get(size_t i);
+    void setEnv(RalEnvPtr env) override;
+    virtual bool is_macro_call(RalEnvPtr env) override;
+    RalTypePtr doList(RalEnvPtr env);
+    RalTypePtr get(size_t i);
     size_t size();
-    MalTypePtr getMeta() override;
-    void setMeta(MalTypePtr meta) override;
+    RalTypePtr getMeta() override;
+    void setMeta(RalTypePtr meta) override;
 };
 
 // ================================================================================
-class MalMap : public MalType {
+class RalMap : public RalType {
   protected:
-    std::map<std::string, MalTypePtr> values_;
-    MalTypePtr meta_;
+    std::map<std::string, RalTypePtr> values_;
+    RalTypePtr meta_;
 
   public:
-    MalMap();
-    MalMap(std::shared_ptr<MalMap> that);
-    ~MalMap() override;
-    MalKind kind() override { return MalKind::MAP; }
+    RalMap();
+    RalMap(std::shared_ptr<RalMap> that);
+    ~RalMap() override;
+    RalKind kind() override { return RalKind::MAP; }
     std::string str(bool readable) override;
-    MalTypePtr eval(MalEnvPtr env) override;
-    bool equal(MalTypePtr that) override;
-    void add(std::string key, MalTypePtr val);
-    MalTypePtr get(MalTypePtr k);
-    void remove(MalTypePtr k);
-    bool hasKey(MalTypePtr k);
-    MalTypePtr getKeys();
-    MalTypePtr getVals();
-    MalTypePtr getMeta() override;
-    void setMeta(MalTypePtr meta) override;
+    RalTypePtr eval(RalEnvPtr env) override;
+    bool equal(RalTypePtr that) override;
+    void add(std::string key, RalTypePtr val);
+    RalTypePtr get(RalTypePtr k);
+    void remove(RalTypePtr k);
+    bool hasKey(RalTypePtr k);
+    RalTypePtr getKeys();
+    RalTypePtr getVals();
+    RalTypePtr getMeta() override;
+    void setMeta(RalTypePtr meta) override;
 };
 
 // ================================================================================
-typedef std::function<MalTypePtr(MalTypeIter, MalTypeIter)> MalFunctionSignature;
-class MalFunction : public MalType {
-    MalFunctionSignature fn_;
+typedef std::function<RalTypePtr(RalTypeIter, RalTypeIter)> RalFunctionSignature;
+class RalFunction : public RalType {
+    RalFunctionSignature fn_;
     std::string name_;
-    MalTypePtr meta_;
+    RalTypePtr meta_;
 
   public:
-    MalFunction();
-    MalFunction(std::string name, MalFunctionSignature fn);
-    ~MalFunction() override;
-    MalKind kind() override { return MalKind::FUNCTION; }
+    RalFunction();
+    RalFunction(std::string name, RalFunctionSignature fn);
+    ~RalFunction() override;
+    RalKind kind() override { return RalKind::FUNCTION; }
     std::string str(bool readable) override;
-    MalTypePtr eval(MalEnvPtr env) override;
-    bool equal(MalTypePtr that) override;
-    MalTypePtr apply(MalTypeIter begin, MalTypeIter end) override;
-    MalTypePtr getMeta() override;
-    void setMeta(MalTypePtr meta) override;
+    RalTypePtr eval(RalEnvPtr env) override;
+    bool equal(RalTypePtr that) override;
+    RalTypePtr apply(RalTypeIter begin, RalTypeIter end) override;
+    RalTypePtr getMeta() override;
+    void setMeta(RalTypePtr meta) override;
 };
 
 // ================================================================================
-class MalLambda : public MalType {
-    std::vector<MalTypePtr> binds_;
-    MalTypePtr form_;
-    MalEnvPtr env_;
+class RalLambda : public RalType {
+    std::vector<RalTypePtr> binds_;
+    RalTypePtr form_;
+    RalEnvPtr env_;
     bool is_macro_;
-    MalTypePtr meta_;
+    RalTypePtr meta_;
 
   public:
-    MalLambda(std::vector<MalTypePtr> binds, MalTypePtr &form, MalEnvPtr env);
-    MalLambda(std::shared_ptr<MalLambda> that);
-    ~MalLambda() override;
-    MalKind kind() override { return MalKind::LAMBDA; }
+    RalLambda(std::vector<RalTypePtr> binds, RalTypePtr &form, RalEnvPtr env);
+    RalLambda(std::shared_ptr<RalLambda> that);
+    ~RalLambda() override;
+    RalKind kind() override { return RalKind::LAMBDA; }
     std::string str(bool readable) override;
-    MalTypePtr eval(MalEnvPtr env) override;
-    bool equal(MalTypePtr that) override;
-    MalTypePtr apply(MalTypeIter begin, MalTypeIter end) override;
-    MalEnvPtr makeEnv(MalTypeIter begin, MalTypeIter end);
-    MalTypePtr form() { return form_; }
+    RalTypePtr eval(RalEnvPtr env) override;
+    bool equal(RalTypePtr that) override;
+    RalTypePtr apply(RalTypeIter begin, RalTypeIter end) override;
+    RalEnvPtr makeEnv(RalTypeIter begin, RalTypeIter end);
+    RalTypePtr form() { return form_; }
     void set_is_macro() { is_macro_ = true; }
     bool get_is_macro() { return is_macro_; }
-    MalTypePtr getMeta() override;
-    void setMeta(MalTypePtr meta) override;
+    RalTypePtr getMeta() override;
+    void setMeta(RalTypePtr meta) override;
 };
 
 // ================================================================================
-class MalAtom : public MalType {
-    MalTypePtr value_;
+class RalAtom : public RalType {
+    RalTypePtr value_;
 
   public:
-    MalAtom(MalTypePtr that);
-    ~MalAtom() override;
-    MalKind kind() override { return MalKind::ATOM; }
+    RalAtom(RalTypePtr that);
+    ~RalAtom() override;
+    RalKind kind() override { return RalKind::ATOM; }
     std::string str(bool readable) override;
-    MalTypePtr eval(MalEnvPtr env) override;
-    bool equal(MalTypePtr that) override;
-    MalTypePtr value();
-    MalTypePtr set(MalTypePtr that);
+    RalTypePtr eval(RalEnvPtr env) override;
+    bool equal(RalTypePtr that) override;
+    RalTypePtr value();
+    RalTypePtr set(RalTypePtr that);
 };
 
 // ================================================================================
 // FIXME -- should clean up  these errors to accept params & be fewer in number.
 // Errors/Exceptions
-class MalMissingParen : public std::exception {
+class RalMissingParen : public std::exception {
     virtual const char *what() const throw()
     {
         return "reached the end of input without finding a ')'";
     }
 };
 
-class MalMissingQuote : public std::exception {
+class RalMissingQuote : public std::exception {
     virtual const char *what() const throw()
     {
         return "reached the end of input for a string without finding a '\"'";
     }
 };
 
-class MalUnbalancedBackslash : public std::exception {
+class RalUnbalancedBackslash : public std::exception {
     virtual const char *what() const throw()
     {
         return "string had unbalanced backslash character";
     }
 };
 
-class MalMissingMapValue : public std::exception {
+class RalMissingMapValue : public std::exception {
     virtual const char *what() const throw()
     {
         return "reached the end of input for a map without finding a paired value for a key.";
     }
 };
 
-class MalBadKeyType : public std::exception {
+class RalBadKeyType : public std::exception {
     virtual const char *what() const throw()
     {
         return "map key is not a string.";
     }
 };
 
-class MalNoIntegerRepresentation : public std::exception {
+class RalNoIntegerRepresentation : public std::exception {
     virtual const char *what() const throw()
     {
         return "no conversion to integer for this type.";
     }
 };
 
-class MalNotApplicable : public std::exception {
+class RalNotApplicable : public std::exception {
     virtual const char *what() const throw()
     {
         return "cannot apply() this type.";
     }
 };
 
-class MalNotInEnvironment : public std::exception {
+class RalNotInEnvironment : public std::exception {
     std::string msg_;
     virtual const char *what() const throw()
     {
@@ -321,34 +321,34 @@ class MalNotInEnvironment : public std::exception {
     }
 
   public:
-    MalNotInEnvironment(std::string name)
+    RalNotInEnvironment(std::string name)
     {
         msg_ = "'" + name + "' not found"; //  in the environment
     }
 };
 
-class MalBadSetEnv : public std::exception {
+class RalBadSetEnv : public std::exception {
     virtual const char *what() const throw()
     {
         return "cannot setEnv() this type.";
     }
 };
 
-class MalBadSetEnvList : public std::exception {
+class RalBadSetEnvList : public std::exception {
     virtual const char *what() const throw()
     {
         return "let* environment list must have an even number of values.";
     }
 };
 
-class MalBadFnParam1 : public std::exception {
+class RalBadFnParam1 : public std::exception {
     virtual const char *what() const throw()
     {
         return "fn* 1st argument must be a list.";
     }
 };
 
-class MalIndexOutOfRange : public std::exception {
+class RalIndexOutOfRange : public std::exception {
     virtual const char *what() const throw()
     {
         return "nth index is out of range.";
@@ -356,7 +356,7 @@ class MalIndexOutOfRange : public std::exception {
 };
 
 
-class MalException : public std::exception {
+class RalException : public std::exception {
     std::string msg_;
     virtual const char *what() const throw()
     {
@@ -364,7 +364,7 @@ class MalException : public std::exception {
     }
 
   public:
-    MalException(std::string msg)
+    RalException(std::string msg)
     {
         msg_ = msg;
     }

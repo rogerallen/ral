@@ -30,16 +30,16 @@
 bool gDebug = false;
 #define DBG LOG(DEBUG) << COND(gDebug)
 
-MalTypePtr READ(std::string s);
-MalTypePtr EVAL(MalTypePtr mp, MalEnvPtr env);
-std::string PRINT(MalTypePtr mp);
-MalTypePtr apply(MalTypePtr mp);
-std::string rep(std::string s, MalEnvPtr env);
-MalTypePtr mal_eval(MalTypeIter begin, MalTypeIter end);
+RalTypePtr READ(std::string s);
+RalTypePtr EVAL(RalTypePtr mp, RalEnvPtr env);
+std::string PRINT(RalTypePtr mp);
+RalTypePtr apply(RalTypePtr mp);
+std::string rep(std::string s, RalEnvPtr env);
+RalTypePtr mal_eval(RalTypeIter begin, RalTypeIter end);
 void setup_repl_env(std::vector<std::string> args);
-bool is_pair(MalTypePtr lp);
-MalTypePtr quasiquote(MalTypePtr mp);
-MalTypePtr macroexpand(MalTypePtr ast, MalEnvPtr env);
+bool is_pair(RalTypePtr lp);
+RalTypePtr quasiquote(RalTypePtr mp);
+RalTypePtr macroexpand(RalTypePtr ast, RalEnvPtr env);
 void completion(const char* editBuffer, std::vector<std::string>& completions);
 
 
@@ -47,12 +47,12 @@ void completion(const char* editBuffer, std::vector<std::string>& completions);
 // FIXME -- maybe there should be a class that has this and
 // also the REPL?  spawn separate threads with different (or shared)
 // environments
-static MalEnvPtr repl_env = std::make_shared<MalEnv>();
+static RalEnvPtr repl_env = std::make_shared<RalEnv>();
 
 // ================================================================================
 // REPL
 // ================================================================================
-MalTypePtr READ(std::string s)
+RalTypePtr READ(std::string s)
 {
     DBG << s << "\n";
     return read_str(s);
@@ -61,7 +61,7 @@ MalTypePtr READ(std::string s)
 // ================================================================================
 // EVAL
 //   note that mp->eval() is equivalent to eval_ast() in instructions
-MalTypePtr EVAL(MalTypePtr mp, MalEnvPtr env)
+RalTypePtr EVAL(RalTypePtr mp, RalEnvPtr env)
 {
     while (true) {
         // if not list, return eval_ast(ast, env)
@@ -82,10 +82,10 @@ MalTypePtr EVAL(MalTypePtr mp, MalEnvPtr env)
             return mp->eval(env);
         }
 
-        // since we know at this point 'mp' is a MalList,
+        // since we know at this point 'mp' is a RalList,
         // rely on only list member functions and only use 'lp'
         // from here
-        auto lp = std::static_pointer_cast<MalList>(mp);
+        auto lp = std::static_pointer_cast<RalList>(mp);
 
         // special env functions
         auto first = lp->get(0)->str(true);
@@ -104,7 +104,7 @@ MalTypePtr EVAL(MalTypePtr mp, MalEnvPtr env)
             auto symbol = lp->get(1)->str(true);
             auto value = lp->get(2);
             auto e = EVAL(value, env);
-            auto lambdap = std::static_pointer_cast<MalLambda>(e);
+            auto lambdap = std::static_pointer_cast<RalLambda>(e);
             lambdap->set_is_macro();
             env->set(symbol, e); // update env
             return e;
@@ -118,10 +118,10 @@ MalTypePtr EVAL(MalTypePtr mp, MalEnvPtr env)
             DBG << "let* " << lp->str(true) << "\n";
             auto letEnvList = lp->get(1);
             auto form = lp->get(2);
-            std::vector<MalTypePtr> binds;
-            std::vector<MalTypePtr> exprs;
+            std::vector<RalTypePtr> binds;
+            std::vector<RalTypePtr> exprs;
             // letEnv is temporary
-            MalEnvPtr let_env = std::make_shared<MalEnv>(env, binds, exprs);
+            RalEnvPtr let_env = std::make_shared<RalEnv>(env, binds, exprs);
             letEnvList->setEnv(let_env);
             //return EVAL(form, let_env);
             // set ast to the last element and loop for tco
@@ -137,7 +137,7 @@ MalTypePtr EVAL(MalTypePtr mp, MalEnvPtr env)
             // eval_ast would do which is EVAL each item. (but the last)
             size_t size = lp->size();
             size_t index = 1; // skip the "do"
-            MalTypePtr p0, p1;
+            RalTypePtr p0, p1;
             for (; index < size - 1; index++) {
                 p1 = EVAL(lp->get(index), env);
             }
@@ -165,15 +165,15 @@ MalTypePtr EVAL(MalTypePtr mp, MalEnvPtr env)
             DBG << "fn* " << lp->str(true) << "\n";
             auto bindings = lp->get(1);
             if (!(bindings->isList() || bindings->isVector())) {
-                throw MalBadFnParam1();
+                throw RalBadFnParam1();
             }
-            auto bindingList = std::static_pointer_cast<MalList>(bindings);
+            auto bindingList = std::static_pointer_cast<RalList>(bindings);
             auto form = lp->get(2);
-            std::vector<MalTypePtr> bindStrs;
+            std::vector<RalTypePtr> bindStrs;
             for (size_t i = 0; i < bindingList->size(); i++) {
                 bindStrs.push_back(bindingList->get(i));
             }
-            return std::make_shared<MalLambda>(bindStrs, form, env);
+            return std::make_shared<RalLambda>(bindStrs, form, env);
         }
         // (quote ...)
         else if(first == "quote") {
@@ -204,17 +204,17 @@ MalTypePtr EVAL(MalTypePtr mp, MalEnvPtr env)
                 mp = EVAL(A, env);
             }
             catch (std::exception &e) {
-                auto ep = std::make_shared<MalString>(e.what());
+                auto ep = std::make_shared<RalString>(e.what());
                 if(lp->size() > 2) {
                     auto catchList = lp->get(2);
-                    auto clp = std::static_pointer_cast<MalList>(catchList);
+                    auto clp = std::static_pointer_cast<RalList>(catchList);
                     auto B = clp->get(1);
                     auto C = clp->get(2);
-                    std::vector<MalTypePtr> binds;
+                    std::vector<RalTypePtr> binds;
                     binds.push_back(B);
-                    std::vector<MalTypePtr> exprs;
+                    std::vector<RalTypePtr> exprs;
                     exprs.push_back(ep);
-                    MalEnvPtr catch_env = std::make_shared<MalEnv>(env, binds, exprs);
+                    RalEnvPtr catch_env = std::make_shared<RalEnv>(env, binds, exprs);
                     mp = EVAL(C, catch_env);
                 }
                 else{
@@ -225,18 +225,18 @@ MalTypePtr EVAL(MalTypePtr mp, MalEnvPtr env)
         else {
             DBG << "list: eval,apply... " << lp->str(true) << "\n";
             // evaluate the list & we know this returns a list
-            auto elp = std::static_pointer_cast<MalList>(lp->eval(env));
+            auto elp = std::static_pointer_cast<RalList>(lp->eval(env));
             // check if first element of the list is a LAMBDA
-            if (elp->get(0)->kind() == MalKind::LAMBDA) {
+            if (elp->get(0)->kind() == RalKind::LAMBDA) {
                 DBG << "lambda apply\n";
                 // special case for TCO
                 auto lambda = elp->get(0);
-                mp = std::static_pointer_cast<MalLambda>(lambda)->form();
-                std::vector<MalTypePtr> rest;
+                mp = std::static_pointer_cast<RalLambda>(lambda)->form();
+                std::vector<RalTypePtr> rest;
                 for (size_t i = 1; i < elp->size(); i++) {
                     rest.push_back(elp->get(i));
                 }
-                env = std::static_pointer_cast<MalLambda>(lambda)->makeEnv(rest.begin(), rest.end());
+                env = std::static_pointer_cast<RalLambda>(lambda)->makeEnv(rest.begin(), rest.end());
             }
             else {
                 return apply(elp);
@@ -245,25 +245,25 @@ MalTypePtr EVAL(MalTypePtr mp, MalEnvPtr env)
     }
 }
 
-bool is_pair(MalTypePtr mp)
+bool is_pair(RalTypePtr mp)
 {
     return (mp->isList() || mp->isVector()) && !(mp->isEmptyList());
 }
 
-MalTypePtr quasiquote(MalTypePtr mp)
+RalTypePtr quasiquote(RalTypePtr mp)
 {
     // if is_pair of ast is false: return a new list containing: 
     // a symbol named "quote" and ast.
     if(!is_pair(mp)) {
         DBG << "!is_pair\n";
-        auto list = std::make_shared<MalList>('(');
-        auto quote = std::make_shared<MalSymbol>("quote");
+        auto list = std::make_shared<RalList>('(');
+        auto quote = std::make_shared<RalSymbol>("quote");
         list->add(quote);
         list->add(mp);
         return list;
     }
     // we know mp is a list
-    auto lp = std::static_pointer_cast<MalList>(mp);
+    auto lp = std::static_pointer_cast<RalList>(mp);
     auto first = lp->get(0);
     // else if the first element of ast is a symbol named "unquote": 
     // return the second element of ast.
@@ -277,14 +277,14 @@ MalTypePtr quasiquote(MalTypePtr mp)
     // a symbol named "concat", the second element of first element 
     // of ast (ast[0][1]), and the result of calling quasiquote with 
     // the second through last element of ast.
-    auto firstlp = std::static_pointer_cast<MalList>(first);
+    auto firstlp = std::static_pointer_cast<RalList>(first);
     if(is_pair(first) && firstlp->get(0)->str(true) == "splice-unquote") {
         DBG << "splice-unquote\n";
-        auto list = std::make_shared<MalList>('(');
-        auto concat = std::make_shared<MalSymbol>("concat");
+        auto list = std::make_shared<RalList>('(');
+        auto concat = std::make_shared<RalSymbol>("concat");
         list->add(concat);
         list->add(firstlp->get(1));
-        auto rest = std::make_shared<MalList>('(');
+        auto rest = std::make_shared<RalList>('(');
         for(size_t i = 1; i < lp->size(); i++) {
             rest->add(lp->get(i));
         }
@@ -298,11 +298,11 @@ MalTypePtr quasiquote(MalTypePtr mp)
     // element of ast.
     {
         DBG << "else cons\n";
-        auto list = std::make_shared<MalList>('(');
-        auto cons = std::make_shared<MalSymbol>("cons");
+        auto list = std::make_shared<RalList>('(');
+        auto cons = std::make_shared<RalSymbol>("cons");
         list->add(cons);
         list->add(quasiquote(first));
-        auto rest = std::make_shared<MalList>('(');
+        auto rest = std::make_shared<RalList>('(');
         for(size_t i = 1; i < lp->size(); i++) {
             rest->add(lp->get(i));
         }
@@ -320,14 +320,14 @@ MalTypePtr quasiquote(MalTypePtr mp)
 // The return value of the macro call becomes the new value of ast. 
 // When the loop completes because ast no longer represents a macro 
 // call, the current value of ast is returned.
-MalTypePtr macroexpand(MalTypePtr ast, MalEnvPtr env) 
+RalTypePtr macroexpand(RalTypePtr ast, RalEnvPtr env) 
 { 
     while(ast->is_macro_call(env)) {
         DBG << "pre: " << ast->str(true) << "\n";
-        auto listp = std::static_pointer_cast<MalList>(ast);
-        auto symbol = std::static_pointer_cast<MalSymbol>(listp->get(0));
-        auto func = std::static_pointer_cast<MalLambda>(symbol->eval(env));
-        auto funclist = std::make_shared<MalList>('(');
+        auto listp = std::static_pointer_cast<RalList>(ast);
+        auto symbol = std::static_pointer_cast<RalSymbol>(listp->get(0));
+        auto func = std::static_pointer_cast<RalLambda>(symbol->eval(env));
+        auto funclist = std::make_shared<RalList>('(');
         funclist->add(func);
         for(size_t i = 1; i < listp->size(); i++) {
             funclist->add(listp->get(i));
@@ -339,30 +339,30 @@ MalTypePtr macroexpand(MalTypePtr ast, MalEnvPtr env)
 }
 
 // ================================================================================
-std::string PRINT(MalTypePtr mp)
+std::string PRINT(RalTypePtr mp)
 {
     DBG << mp->str(true) << "\n";
     return pr_str(mp, true);
 }
 
 // ================================================================================
-MalTypePtr apply(MalTypePtr mp) // FIXME -- reconsider based on mp->lp change in eval
+RalTypePtr apply(RalTypePtr mp) // FIXME -- reconsider based on mp->lp change in eval
 {
     DBG << mp->str(true) << "\n";
-    // m can only be a MalListType here
+    // m can only be a RalListType here
     // exposing iterators was too much leaking abstration.
     return mp->apply();
 }
 
 // ================================================================================
-std::string rep(std::string s, MalEnvPtr env)
+std::string rep(std::string s, RalEnvPtr env)
 {
     return PRINT(EVAL(READ(s), env));
 }
 
 // ================================================================================
 // FIXME -- move mal_eval into malCore (eval-with-env form env)?  make eval special form?
-MalTypePtr mal_eval(MalTypeIter begin, MalTypeIter end)
+RalTypePtr mal_eval(RalTypeIter begin, RalTypeIter end)
 {
     return EVAL(*begin, repl_env);
 }
@@ -371,21 +371,21 @@ MalTypePtr mal_eval(MalTypeIter begin, MalTypeIter end)
 void setup_repl_env(std::vector<std::string> args)
 {
     // setup repl_env core builtins
-    for (auto kv : MalCore::ns) {
+    for (auto kv : RalCore::ns) {
         repl_env->set(kv.first, kv.second);
     }
     // add eval
     repl_env->set("eval", mal_eval);
     // add commandline arguments
-    MalTypePtr argslist = std::make_shared<MalList>('(');
+    RalTypePtr argslist = std::make_shared<RalList>('(');
     for (size_t i = 1; i < args.size(); i++) {
-        MalTypePtr sp = std::make_shared<MalString>(args[i]);
-        std::static_pointer_cast<MalList>(argslist)->add(sp);
+        RalTypePtr sp = std::make_shared<RalString>(args[i]);
+        std::static_pointer_cast<RalList>(argslist)->add(sp);
     }
     repl_env->set("*ARGV*", argslist);
-    repl_env->set("*host-language*", std::make_shared<MalString>("C++"));
-    repl_env->set("*version*", std::make_shared<MalString>(RAL_VERSION));
-    repl_env->set("*build-type*", std::make_shared<MalString>(RAL_BUILD_TYPE));
+    repl_env->set("*host-language*", std::make_shared<RalString>("C++"));
+    repl_env->set("*version*", std::make_shared<RalString>(RAL_VERSION));
+    repl_env->set("*build-type*", std::make_shared<RalString>(RAL_BUILD_TYPE));
     // add some functions
     rep("(def! not (fn* (a) (if a false true)))", repl_env);
     rep("(def! load-file (fn* (f) (eval (read-string (str \"(do \" (slurp f) \"\nnil)\")))))", repl_env);

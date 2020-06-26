@@ -24,133 +24,133 @@ extern bool gDebug;
 #define DBG LOG(DEBUG) << COND(gDebug)
 #endif
 
-MalTypePtr EVAL(MalTypePtr mp, MalEnvPtr env);
+RalTypePtr EVAL(RalTypePtr mp, RalEnvPtr env);
 
 // ================================================================================
-// when using a MalType as a key for the MalMap, use this function to 
+// when using a RalType as a key for the RalMap, use this function to 
 // get the string to use as a key.  Only String and Keyword types should
 // override this and implement it.  Other types should throw an error.
 // This avoids checking derived types in the reader function.
-std::string MalType::asMapKey() {
-    throw MalBadKeyType();
+std::string RalType::asMapKey() {
+    throw RalBadKeyType();
 }
 
 // ================================================================================
-// most things are not able to apply, only MalFunctions apply.
-MalTypePtr MalType::apply(MalTypeIter begin, MalTypeIter end) {
-    throw MalNotApplicable();
+// most things are not able to apply, only RalFunctions apply.
+RalTypePtr RalType::apply(RalTypeIter begin, RalTypeIter end) {
+    throw RalNotApplicable();
 }
 
 // ================================================================================
-// when using MalType for arithmentic, use this function to get the value.
+// when using RalType for arithmentic, use this function to get the value.
 // Only integer will override this an implement it.
-int64_t MalType::asInt() {
-    throw MalNoIntegerRepresentation();
+int64_t RalType::asInt() {
+    throw RalNoIntegerRepresentation();
 }
 
 // ================================================================================
 // if statement is true if condition is not nil or false
 // override this only in the Constant class.
-bool MalType::isNilOrFalse() {
+bool RalType::isNilOrFalse() {
     return false;
 }
 
 // ================================================================================
-MalTypePtr MalType::getMeta() {
-    return std::make_shared<MalConstant>("nil");
+RalTypePtr RalType::getMeta() {
+    return std::make_shared<RalConstant>("nil");
 }
 
 // ================================================================================
-void MalType::setMeta(MalTypePtr meta)
+void RalType::setMeta(RalTypePtr meta)
 {
-    throw MalException("Cannot set the meta-data for this type.");
+    throw RalException("Cannot set the meta-data for this type.");
 }
 
 // ================================================================================
 // overrides for only the list type 
 // ???FIXME??? throw Error? -- only when static analysis cannot confirm no issue.
-bool MalType::isList() { return false; }
-bool MalType::isVector() { return false; }
-bool MalType::isEmptyList() { return false; }
-MalTypePtr MalType::apply() { return nullptr; }
-void MalType::setEnv(MalEnvPtr env) { throw MalBadSetEnv(); }
-bool MalType::is_macro_call(MalEnvPtr env) { return false; }
+bool RalType::isList() { return false; }
+bool RalType::isVector() { return false; }
+bool RalType::isEmptyList() { return false; }
+RalTypePtr RalType::apply() { return nullptr; }
+void RalType::setEnv(RalEnvPtr env) { throw RalBadSetEnv(); }
+bool RalType::is_macro_call(RalEnvPtr env) { return false; }
 
 // ================================================================================
-MalInteger::MalInteger(std::string s)
+RalInteger::RalInteger(std::string s)
 {
     repr_ = s;
     value_ = std::stoi(s);
 }
 
-MalInteger::MalInteger(int64_t i)
+RalInteger::RalInteger(int64_t i)
 {
     repr_ = std::to_string(i);
     value_ = i;
 }
 
-MalInteger::MalInteger(MalInteger *that)
+RalInteger::RalInteger(RalInteger *that)
 {
     repr_ = that->repr_;
     value_ = that->value_;
 }
 
-MalInteger::~MalInteger()
+RalInteger::~RalInteger()
 {
 }
 
-std::string MalInteger::str(bool readable)
+std::string RalInteger::str(bool readable)
 {
     return std::to_string(value_);
 }
 
-MalTypePtr MalInteger::eval(MalEnvPtr env)
+RalTypePtr RalInteger::eval(RalEnvPtr env)
 {
-    return std::make_shared<MalInteger>(MalInteger(this));
+    return std::make_shared<RalInteger>(RalInteger(this));
 }
 
-bool MalInteger::equal(MalTypePtr that)
+bool RalInteger::equal(RalTypePtr that)
 {
-    auto b = std::static_pointer_cast<MalInteger>(that);
+    auto b = std::static_pointer_cast<RalInteger>(that);
     return value_ == b->asInt();
 }
 
-int64_t MalInteger::asInt() {
+int64_t RalInteger::asInt() {
     return value_;
 }
 
 // ================================================================================
-MalConstant::MalConstant(std::string s)
+RalConstant::RalConstant(std::string s)
 {
     repr_ = s;
 }
 
-MalConstant::MalConstant(MalConstant *that)
+RalConstant::RalConstant(RalConstant *that)
 {
     repr_ = that->repr_;
 }
 
-MalConstant::~MalConstant()
+RalConstant::~RalConstant()
 {
 }
 
-std::string MalConstant::str(bool readable)
+std::string RalConstant::str(bool readable)
 {
     return repr_;
 }
 
-MalTypePtr MalConstant::eval(MalEnvPtr env)
+RalTypePtr RalConstant::eval(RalEnvPtr env)
 {
-    return std::make_shared<MalConstant>(MalConstant(this));
+    return std::make_shared<RalConstant>(RalConstant(this));
 }
 
-bool MalConstant::equal(MalTypePtr that)
+bool RalConstant::equal(RalTypePtr that)
 {
-    auto b = std::static_pointer_cast<MalConstant>(that);
+    auto b = std::static_pointer_cast<RalConstant>(that);
     return repr_ == b->str(false);
 }
 
-int64_t MalConstant::asInt()
+int64_t RalConstant::asInt()
 {
     if(repr_ == "nil") {
         return 0;
@@ -163,33 +163,33 @@ int64_t MalConstant::asInt()
     }
 }
 
-bool MalConstant::isNilOrFalse() {
+bool RalConstant::isNilOrFalse() {
     return (repr_ == "nil") || (repr_ == "false");
 }
 
 // ================================================================================
-MalSymbol::MalSymbol(std::string s)
+RalSymbol::RalSymbol(std::string s)
 {
     repr_ = s;
 }
 
-MalSymbol::~MalSymbol()
+RalSymbol::~RalSymbol()
 {
 }
 
-std::string MalSymbol::str(bool readable)
+std::string RalSymbol::str(bool readable)
 {
     return repr_;
 }
 
-MalTypePtr MalSymbol::eval(MalEnvPtr env)
+RalTypePtr RalSymbol::eval(RalEnvPtr env)
 {
     return env->get(repr_);
 }
 
-bool MalSymbol::equal(MalTypePtr that)
+bool RalSymbol::equal(RalTypePtr that)
 {
-    auto b = std::static_pointer_cast<MalSymbol>(that);
+    auto b = std::static_pointer_cast<RalSymbol>(that);
     return repr_ == b->str(false);
 }
 
@@ -219,7 +219,7 @@ std::string transformToPrintable(std::string s)
         if(s[i] == '\\') {
             if((i + 1 >= s.length() - 1) ||
                !((s[i+1] == '\"') || (s[i+1] == 'n') || (s[i+1] == '\\'))) {
-                throw MalUnbalancedBackslash();
+                throw RalUnbalancedBackslash();
             }
             i++;
             switch(s[i]) {
@@ -262,95 +262,95 @@ std::string transformToReadable(std::string s)
 }
 
 // ================================================================================
-MalString::MalString(std::string s)
+RalString::RalString(std::string s)
 {
     repr_ = s;  
 }
 
-MalString::MalString(MalString *that)
+RalString::RalString(RalString *that)
 {
     repr_ = that->repr_;
 }
 
-MalString::~MalString()
+RalString::~RalString()
 {
 }
 
-std::string MalString::str(bool readable)
+std::string RalString::str(bool readable)
 {
     return readable ? "\""+transformToReadable(repr_)+"\"" : repr_;
 }
 
-MalTypePtr MalString::eval(MalEnvPtr env)
+RalTypePtr RalString::eval(RalEnvPtr env)
 { 
-    return std::make_shared<MalString>(MalString(this));
+    return std::make_shared<RalString>(RalString(this));
 }
 
-bool MalString::equal(MalTypePtr that)
+bool RalString::equal(RalTypePtr that)
 {
-    auto b = std::static_pointer_cast<MalString>(that);
+    auto b = std::static_pointer_cast<RalString>(that);
     return repr_ == b->str(false);
 }
 
-std::string MalString::asMapKey() {
+std::string RalString::asMapKey() {
     return str(false);
 }
 
 // ================================================================================
-MalKeyword::MalKeyword(std::string s)
+RalKeyword::RalKeyword(std::string s)
 {
     repr_ = s;
 }
 
-MalKeyword::MalKeyword(MalKeyword *that)
+RalKeyword::RalKeyword(RalKeyword *that)
 {
     repr_ = that->repr_;
 }
 
 
-MalKeyword::~MalKeyword()
+RalKeyword::~RalKeyword()
 {
 }
 
-std::string MalKeyword::str(bool readable)
+std::string RalKeyword::str(bool readable)
 {
     return repr_;
 }
 
-MalTypePtr MalKeyword::eval(MalEnvPtr env)
+RalTypePtr RalKeyword::eval(RalEnvPtr env)
 { 
-    return std::make_shared<MalKeyword>(MalKeyword(this));  
+    return std::make_shared<RalKeyword>(RalKeyword(this));  
 }
 
-bool MalKeyword::equal(MalTypePtr that)
+bool RalKeyword::equal(RalTypePtr that)
 {
-    auto b = std::static_pointer_cast<MalKeyword>(that);
+    auto b = std::static_pointer_cast<RalKeyword>(that);
     return repr_ == b->str(false);
 }
 
-std::string MalKeyword::asMapKey() {
+std::string RalKeyword::asMapKey() {
     return char(255)+str(true);
 }
 
 // ================================================================================
-MalList::MalList(char listStartChar) 
+RalList::RalList(char listStartChar) 
 {
     listStartChar_ = listStartChar;
-    meta_ = std::make_shared<MalConstant>("nil");
+    meta_ = std::make_shared<RalConstant>("nil");
 }
 
-MalList::MalList(std::shared_ptr<MalList> that)
+RalList::RalList(std::shared_ptr<RalList> that)
 {
     values_ = that->values_;
     listStartChar_ = that->listStartChar_;
     meta_ = that->meta_;
 }
 
-MalList::~MalList()
+RalList::~RalList()
 {
 }
 
-std::string MalList::listStartStr()
+std::string RalList::listStartStr()
 {
     switch(listStartChar_) {
     default:
@@ -361,7 +361,7 @@ std::string MalList::listStartStr()
     }
 }
 
-std::string MalList::listEndStr()
+std::string RalList::listEndStr()
 {
     switch(listStartChar_) {
     default:
@@ -372,7 +372,7 @@ std::string MalList::listEndStr()
     }
 }
 
-std::string MalList::str(bool readable)
+std::string RalList::str(bool readable)
 {
     std::string s;
     s += listStartStr();
@@ -388,36 +388,36 @@ std::string MalList::str(bool readable)
     return s;
 }
 
-MalTypePtr MalList::eval(MalEnvPtr env)
+RalTypePtr RalList::eval(RalEnvPtr env)
 {
     // Evaluate all items in the list
-    std::vector<MalTypePtr> evaluated;
+    std::vector<RalTypePtr> evaluated;
     for(auto &v: values_) {
         // NOTE EVAL, not v->eval().  This allows for apply()
         evaluated.push_back(EVAL(v,env));
     }
     // return new evaluated list
     auto iter = evaluated.begin();
-    MalTypePtr mp = std::make_shared<MalList>(MalList(listStartChar_));
+    RalTypePtr mp = std::make_shared<RalList>(RalList(listStartChar_));
     for(;iter != evaluated.end(); iter++) {
-        std::static_pointer_cast<MalList>(mp)->add(*iter);
+        std::static_pointer_cast<RalList>(mp)->add(*iter);
     }
     return mp;
 }
 
-MalTypePtr MalList::get(size_t i)
+RalTypePtr RalList::get(size_t i)
 {
     if(values_.size() > i) {
         return values_[i]; 
     }
     else {
-        return std::make_shared<MalConstant>("nil");
+        return std::make_shared<RalConstant>("nil");
     }
 }
 
-bool MalList::equal(MalTypePtr that)
+bool RalList::equal(RalTypePtr that)
 {
-    auto b = std::static_pointer_cast<MalList>(that);
+    auto b = std::static_pointer_cast<RalList>(that);
     bool result = false;
     if(size() == b->size()) {
         size_t i = 0; 
@@ -439,7 +439,7 @@ bool MalList::equal(MalTypePtr that)
 }
 
 // tried to move apply fully into main, but iterators made that troublesome.
-MalTypePtr MalList::apply() 
+RalTypePtr RalList::apply() 
 { 
     // apply the first value as a function
     auto iter = values_.begin();
@@ -448,26 +448,26 @@ MalTypePtr MalList::apply()
     return val;
 }
 
-void MalList::add(MalTypePtr mp)
+void RalList::add(RalTypePtr mp)
 {
     values_.push_back(mp);
 }
 
-MalTypePtr MalList::count()
+RalTypePtr RalList::count()
 {
     size_t n = values_.size();
-    return std::make_shared<MalInteger>((int64_t)n);
+    return std::make_shared<RalInteger>((int64_t)n);
 }
 
-bool MalList::isList() { return listStartChar_ == '('; }
-bool MalList::isVector() { return listStartChar_ == '['; }
+bool RalList::isList() { return listStartChar_ == '('; }
+bool RalList::isVector() { return listStartChar_ == '['; }
 // empty list or vector
-bool MalList::isEmptyList() { return values_.size() == 0; }
+bool RalList::isEmptyList() { return values_.size() == 0; }
 // setEnv modifies the environment env
-void MalList::setEnv(MalEnvPtr env)
+void RalList::setEnv(RalEnvPtr env)
 {
     if(values_.size() % 2 != 0) {
-        throw MalBadSetEnvList();
+        throw RalBadSetEnvList();
     }
     // Evaluate all items in the list, updating env
     // NOTE: earlier pairs in the list can affect later pairs
@@ -482,16 +482,16 @@ void MalList::setEnv(MalEnvPtr env)
 // as the first element and that symbol refers to a function in the 
 // env environment and that function has the is_macro_ attribute set to 
 // true. Otherwise, it returns false.
-bool MalList::is_macro_call(MalEnvPtr env) 
+bool RalList::is_macro_call(RalEnvPtr env) 
 { 
     auto first = values_[0];
-    if(first->kind() == MalKind::SYMBOL) {
+    if(first->kind() == RalKind::SYMBOL) {
         try {
             auto refers = first->eval(env);
-            if(refers->kind() == MalKind::LAMBDA) {
-                return std::static_pointer_cast<MalLambda>(refers)->get_is_macro();
+            if(refers->kind() == RalKind::LAMBDA) {
+                return std::static_pointer_cast<RalLambda>(refers)->get_is_macro();
             }
-        } catch (MalNotInEnvironment e) {
+        } catch (RalNotInEnvironment e) {
             // if not found, just return false;
             return false;
         }
@@ -501,11 +501,11 @@ bool MalList::is_macro_call(MalEnvPtr env)
 
 // FIXME DELETE
 // handle do special form
-MalTypePtr MalList::doList(MalEnvPtr env) 
+RalTypePtr RalList::doList(RalEnvPtr env) 
 { 
     // EVAL() all items in the list, returning the last one
     // instructions say eval_ast, but EVAL is needed
-    MalTypePtr mp;
+    RalTypePtr mp;
     auto iter = values_.begin();
     iter++; // eat the "do"
     for(; iter != values_.end(); iter++) {
@@ -514,36 +514,36 @@ MalTypePtr MalList::doList(MalEnvPtr env)
     return mp; 
 }
 
-size_t MalList::size()
+size_t RalList::size()
 {
     return values_.size();
 }
 
-MalTypePtr MalList::getMeta() {
+RalTypePtr RalList::getMeta() {
     return meta_;
 }
 
-void MalList::setMeta(MalTypePtr meta) {
+void RalList::setMeta(RalTypePtr meta) {
     meta_ = meta;
 }
 
 // ================================================================================
-MalMap::MalMap() 
+RalMap::RalMap() 
 {
-    meta_ = std::make_shared<MalConstant>("nil");
+    meta_ = std::make_shared<RalConstant>("nil");
 }
 
-MalMap::MalMap(std::shared_ptr<MalMap> that)
+RalMap::RalMap(std::shared_ptr<RalMap> that)
 {
     values_ = that->values_;
     meta_ = that->meta_;
 }
 
-MalMap::~MalMap()
+RalMap::~RalMap()
 {
 }
 
-std::string MalMap::str(bool readable)
+std::string RalMap::str(bool readable)
 {
     std::string s;
     s += "{";
@@ -568,26 +568,26 @@ std::string MalMap::str(bool readable)
     return s;
 }
 
-MalTypePtr MalMap::eval(MalEnvPtr env)
+RalTypePtr RalMap::eval(RalEnvPtr env)
 { 
     // Evaluate all values in the map
-    std::map<std::string, MalTypePtr> evaluated;
+    std::map<std::string, RalTypePtr> evaluated;
     for(auto &v: values_) {
         // note EVAL (allows for apply())
         evaluated[v.first] = EVAL(v.second, env);
     }
     auto iter = evaluated.begin();
     // return a new evaluated map
-    MalTypePtr mp = std::make_shared<MalMap>(MalMap());
+    RalTypePtr mp = std::make_shared<RalMap>(RalMap());
     for(;iter != evaluated.end(); iter++) {
-        std::static_pointer_cast<MalMap>(mp)->add(iter->first, iter->second);
+        std::static_pointer_cast<RalMap>(mp)->add(iter->first, iter->second);
     }
     return mp;
 }
 
-bool MalMap::equal(MalTypePtr that)
+bool RalMap::equal(RalTypePtr that)
 {
-    auto b = std::static_pointer_cast<MalMap>(that);
+    auto b = std::static_pointer_cast<RalMap>(that);
     bool result = false;
     if(values_.size() == b->values_.size()) {
         auto ai = values_.begin();
@@ -611,22 +611,22 @@ bool MalMap::equal(MalTypePtr that)
     return result;
 }
 
-void MalMap::add(std::string k, MalTypePtr v)
+void RalMap::add(std::string k, RalTypePtr v)
 {
     values_[k] = v;
 }
 
-MalTypePtr MalMap::get(MalTypePtr k)
+RalTypePtr RalMap::get(RalTypePtr k)
 {
     auto key = k->asMapKey();
     auto pos = values_.find(key);
     if(pos == values_.end()) {
-        return std::make_shared<MalConstant>("nil");
+        return std::make_shared<RalConstant>("nil");
     }
     return pos->second;
 }
 
-void MalMap::remove(MalTypePtr k)
+void RalMap::remove(RalTypePtr k)
 {
     auto key = k->asMapKey();
     DBG << "key = >" << key << "<\n";
@@ -637,109 +637,109 @@ void MalMap::remove(MalTypePtr k)
     }
 }
 
-bool MalMap::hasKey(MalTypePtr k)
+bool RalMap::hasKey(RalTypePtr k)
 {
     auto key = k->asMapKey();
     auto pos = values_.find(key);
     return pos != values_.end();
 }
 
-MalTypePtr MalMap::getKeys()
+RalTypePtr RalMap::getKeys()
 {
-    auto mp = std::make_shared<MalList>('(');
+    auto mp = std::make_shared<RalList>('(');
     for (const auto &p : values_) {
-        MalTypePtr mkp;
+        RalTypePtr mkp;
         std::string key = p.first;
         if((p.first)[0] == char(255)) {
             key = p.first.substr(1);
-            mkp = std::make_shared<MalKeyword>(key);
+            mkp = std::make_shared<RalKeyword>(key);
         }
         else {
-            mkp = std::make_shared<MalString>(key);
+            mkp = std::make_shared<RalString>(key);
         }
         mp->add(mkp);
     }
     return mp;
 }
 
-MalTypePtr MalMap::getVals()
+RalTypePtr RalMap::getVals()
 {
-    auto mp = std::make_shared<MalList>('(');
+    auto mp = std::make_shared<RalList>('(');
     for (const auto &p : values_) {
         mp->add(p.second);
     }
     return mp;
 }
 
-MalTypePtr MalMap::getMeta() {
+RalTypePtr RalMap::getMeta() {
     return meta_;
 }
 
-void MalMap::setMeta(MalTypePtr meta) {
+void RalMap::setMeta(RalTypePtr meta) {
     meta_ = meta;
 }
 
 
 // ================================================================================
-MalFunction::MalFunction()
+RalFunction::RalFunction()
 {
     name_ = "#<function>:null";
     fn_ = nullptr;
-    meta_ = std::make_shared<MalConstant>("nil");
+    meta_ = std::make_shared<RalConstant>("nil");
 }
 
-MalFunction::MalFunction(std::string name, MalFunctionSignature fn)
+RalFunction::RalFunction(std::string name, RalFunctionSignature fn)
 {
     name_ = "#<function>:"+name;
     fn_ = fn;
-    meta_ = std::make_shared<MalConstant>("nil");
+    meta_ = std::make_shared<RalConstant>("nil");
 }
 
-MalFunction::~MalFunction()
+RalFunction::~RalFunction()
 {}
 
-std::string MalFunction::str(bool readable)
+std::string RalFunction::str(bool readable)
 {
     return name_;
 }
 
-MalTypePtr MalFunction::eval(MalEnvPtr env)
+RalTypePtr RalFunction::eval(RalEnvPtr env)
 { 
     return nullptr; /*FIXME*/ 
 }
 
-bool MalFunction::equal(MalTypePtr that)
+bool RalFunction::equal(RalTypePtr that)
 {
-    auto b = std::static_pointer_cast<MalFunction>(that);
+    auto b = std::static_pointer_cast<RalFunction>(that);
     return name_ == b->str(false);
 }
 
 
-MalTypePtr MalFunction::apply(MalTypeIter begin, MalTypeIter end)
+RalTypePtr RalFunction::apply(RalTypeIter begin, RalTypeIter end)
 {
     return (fn_)(begin,end);
 }
 
 
-MalTypePtr MalFunction::getMeta() {
+RalTypePtr RalFunction::getMeta() {
     return meta_;
 }
 
-void MalFunction::setMeta(MalTypePtr meta) {
+void RalFunction::setMeta(RalTypePtr meta) {
     meta_ = meta;
 }
 
 // ================================================================================
-MalLambda::MalLambda(std::vector<MalTypePtr> binds, MalTypePtr &form, MalEnvPtr env)
+RalLambda::RalLambda(std::vector<RalTypePtr> binds, RalTypePtr &form, RalEnvPtr env)
 {
     binds_ = binds;
     form_ = form;
     env_ = env;
     is_macro_ = false;
-    meta_ = std::make_shared<MalConstant>("nil");
+    meta_ = std::make_shared<RalConstant>("nil");
 }
 
-MalLambda::MalLambda(std::shared_ptr<MalLambda> that)
+RalLambda::RalLambda(std::shared_ptr<RalLambda> that)
 {
     binds_ = that->binds_;
     form_ = that->form_;
@@ -748,73 +748,73 @@ MalLambda::MalLambda(std::shared_ptr<MalLambda> that)
     meta_ = that->meta_;
 }
 
-MalLambda::~MalLambda() 
+RalLambda::~RalLambda() 
 {}
 
-std::string MalLambda::str(bool readable)
+std::string RalLambda::str(bool readable)
 {
     return "#<function>";
 }
 
-MalTypePtr MalLambda::eval(MalEnvPtr env)
+RalTypePtr RalLambda::eval(RalEnvPtr env)
 { 
     return nullptr; /*FIXME*/ 
 }
 
-bool MalLambda::equal(MalTypePtr that)
+bool RalLambda::equal(RalTypePtr that)
 {
-    auto b = std::static_pointer_cast<MalLambda>(that);
+    auto b = std::static_pointer_cast<RalLambda>(that);
     return false; // FIXME?
 }
 
-MalTypePtr MalLambda::apply(MalTypeIter begin, MalTypeIter end)
+RalTypePtr RalLambda::apply(RalTypeIter begin, RalTypeIter end)
 {
-    MalEnvPtr lambda_env = makeEnv(begin, end);
+    RalEnvPtr lambda_env = makeEnv(begin, end);
     return EVAL(form_,lambda_env);
 }
 
-MalEnvPtr MalLambda::makeEnv(MalTypeIter begin, MalTypeIter end)
+RalEnvPtr RalLambda::makeEnv(RalTypeIter begin, RalTypeIter end)
 {
-    std::vector<MalTypePtr> exprs;
+    std::vector<RalTypePtr> exprs;
     for(auto iter = begin; iter != end; iter++) {
         exprs.push_back(*iter);
     }
-    MalEnvPtr lambda_env = std::make_shared<MalEnv>(env_,binds_,exprs); 
+    RalEnvPtr lambda_env = std::make_shared<RalEnv>(env_,binds_,exprs); 
     return lambda_env;
 }
 
-MalTypePtr MalLambda::getMeta() {
+RalTypePtr RalLambda::getMeta() {
     return meta_;
 }
 
-void MalLambda::setMeta(MalTypePtr meta) {
+void RalLambda::setMeta(RalTypePtr meta) {
     meta_ = meta;
 }
 
 // ================================================================================
-MalAtom::MalAtom(MalTypePtr that)
+RalAtom::RalAtom(RalTypePtr that)
 {
     value_ = that;
 }
-MalAtom::~MalAtom()
+RalAtom::~RalAtom()
 {}
-std::string MalAtom::str(bool readable)
+std::string RalAtom::str(bool readable)
 {
     return "(atom "+value_->str(true)+")";
 }
-MalTypePtr MalAtom::eval(MalEnvPtr env)
+RalTypePtr RalAtom::eval(RalEnvPtr env)
 {
     return nullptr; /*FIXME*/ 
 }
-bool MalAtom::equal(MalTypePtr that)
+bool RalAtom::equal(RalTypePtr that)
 {
     return false; // FIXME
 }
-MalTypePtr MalAtom::value()
+RalTypePtr RalAtom::value()
 {
     return value_;
 }
-MalTypePtr MalAtom::set(MalTypePtr that)
+RalTypePtr RalAtom::set(RalTypePtr that)
 {
     value_ = that;
     return value_;

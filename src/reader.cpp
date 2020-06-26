@@ -61,11 +61,11 @@ std::string Reader::peek()
 // ================================================================================
 // read_str will call tokenize and then create a new Reader object instance with
 // the tokens. Then it will call read_form with the Reader instance.
-MalTypePtr read_str(std::string s)
+RalTypePtr read_str(std::string s)
 {
     std::vector<std::string> tokens = tokenize(s);
     Reader r(tokens);
-    MalTypePtr mp = read_form(r);
+    RalTypePtr mp = read_form(r);
     return mp;
 }
 
@@ -74,7 +74,7 @@ MalTypePtr read_str(std::string s)
 // first character of that token. If the character is a left paren then read_list
 // is called with the Reader object. Otherwise, read_atom is called with the Reader
 // Object. The return value from read_form is a mal data type.
-MalTypePtr read_form(Reader &r)
+RalTypePtr read_form(Reader &r)
 {
     std::string firstToken = r.peek();
     switch (firstToken[0]) {
@@ -92,22 +92,22 @@ MalTypePtr read_form(Reader &r)
 // encounters a ')' token (if it reach EOF before reading a ')' then that is an
 // error). It accumulates the results into a List type.
 // Now also works for the '[]' vector type and '{}' assoc arrays
-MalTypePtr read_list(Reader &r, char listStartChar)
+RalTypePtr read_list(Reader &r, char listStartChar)
 {
     bool listNotMap = listStartChar != '{';
-    MalTypePtr mp;
+    RalTypePtr mp;
     std::string listEndStr = listStartChar == '(' ? ")" : (listStartChar == '[' ? "]" : "}");
     r.next(); // eat the "(" or "[" or "{" char
     if (listNotMap) {
-        mp = std::make_shared<MalList>(listStartChar);
+        mp = std::make_shared<RalList>(listStartChar);
     }
     else {
-        mp = std::make_shared<MalMap>();
+        mp = std::make_shared<RalMap>();
     }
     DBG << "read_list: start\n";
     while (true) {
         if (r.peek() == "") {
-            throw MalMissingParen(); // !!! ERROR !!!  FIXME pass listEndStr
+            throw RalMissingParen(); // !!! ERROR !!!  FIXME pass listEndStr
         }
         else if (r.peek() == listEndStr) {
             r.next(); // eat the ")" or "]" or "}"
@@ -115,21 +115,21 @@ MalTypePtr read_list(Reader &r, char listStartChar)
         }
         else {
             if (listNotMap) {
-                std::static_pointer_cast<MalList>(mp)->add(read_form(r));
+                std::static_pointer_cast<RalList>(mp)->add(read_form(r));
             }
             else {
-                MalTypePtr keyForm = read_form(r);
+                RalTypePtr keyForm = read_form(r);
                 if (r.peek() == "") {
-                    throw MalMissingParen(); // !!! ERROR !!!  FIXME pass listEndStr
+                    throw RalMissingParen(); // !!! ERROR !!!  FIXME pass listEndStr
                 }
                 else if (r.peek() == listEndStr) {
-                    throw MalMissingMapValue();
+                    throw RalMissingMapValue();
                 }
                 else {
                     // this will throw if not good mapkey
                     std::string key = keyForm->asMapKey();
-                    MalTypePtr valForm = read_form(r);
-                    std::static_pointer_cast<MalMap>(mp)->add(key, valForm);
+                    RalTypePtr valForm = read_form(r);
+                    std::static_pointer_cast<RalMap>(mp)->add(key, valForm);
                 }
             }
         }
@@ -149,12 +149,12 @@ MalTypePtr read_list(Reader &r, char listStartChar)
 // - numbers (float or double) TODO (I want to do this)
 // It also handles reader-macro expansion.
 static const std::regex integer_regex(R"([+-]\d+|\d+)"); // FIXME +/-, hex, etc.
-MalTypePtr read_atom(Reader &r)
+RalTypePtr read_atom(Reader &r)
 {
     std::string repr = r.next();
     if (std::regex_match(repr, integer_regex)) {
         DBG << "read_atom: integer >" << repr << "<\n";
-        MalTypePtr mp = std::make_shared<MalInteger>(repr);
+        RalTypePtr mp = std::make_shared<RalInteger>(repr);
         return mp;
     }
     else if ((repr == "") || (repr == "nil") || (repr == "true") || (repr == "false")) {
@@ -162,57 +162,57 @@ MalTypePtr read_atom(Reader &r)
             repr = "nil";
         }
         DBG << "read_atom: constant >" << repr << "<\n";
-        MalTypePtr mp = std::make_shared<MalConstant>(repr);
+        RalTypePtr mp = std::make_shared<RalConstant>(repr);
         return mp;
     }
     else if (repr[0] == '"') {
         if ((repr.length() == 1) || (repr[repr.size() - 1] != '"')) {
-            throw MalMissingQuote();
+            throw RalMissingQuote();
         }
         DBG << "read_atom: string raw>" << repr << "<\n";
         repr = transformToPrintable(repr);
         DBG << "read_atom: string xfm>" << repr << "<\n";
-        MalTypePtr mp = std::make_shared<MalString>(repr);
+        RalTypePtr mp = std::make_shared<RalString>(repr);
         return mp;
     }
     else if (repr[0] == ':') {
         DBG << "read_atom: keyword >" << repr << "<\n";
-        MalTypePtr mp = std::make_shared<MalKeyword>(repr);
+        RalTypePtr mp = std::make_shared<RalKeyword>(repr);
         return mp;
     }
     else if (repr == "'") {
         DBG << "read_atom: macro:quote >" << repr << "<\n";
-        MalTypePtr mp = std::make_shared<MalList>('(');
-        std::static_pointer_cast<MalList>(mp)->add(std::make_shared<MalSymbol>("quote"));
-        std::static_pointer_cast<MalList>(mp)->add(read_form(r));
+        RalTypePtr mp = std::make_shared<RalList>('(');
+        std::static_pointer_cast<RalList>(mp)->add(std::make_shared<RalSymbol>("quote"));
+        std::static_pointer_cast<RalList>(mp)->add(read_form(r));
         return mp;
     }
     else if (repr == "`") {
         DBG << "read_atom: macro:quasiquote >" << repr << "<\n";
-        MalTypePtr mp = std::make_shared<MalList>('(');
-        std::static_pointer_cast<MalList>(mp)->add(std::make_shared<MalSymbol>("quasiquote"));
-        std::static_pointer_cast<MalList>(mp)->add(read_form(r));
+        RalTypePtr mp = std::make_shared<RalList>('(');
+        std::static_pointer_cast<RalList>(mp)->add(std::make_shared<RalSymbol>("quasiquote"));
+        std::static_pointer_cast<RalList>(mp)->add(read_form(r));
         return mp;
     }
     else if (repr == "~") {
         DBG << "read_atom: macro:unquote >" << repr << "<\n";
-        MalTypePtr mp = std::make_shared<MalList>('(');
-        std::static_pointer_cast<MalList>(mp)->add(std::make_shared<MalSymbol>("unquote"));
-        std::static_pointer_cast<MalList>(mp)->add(read_form(r));
+        RalTypePtr mp = std::make_shared<RalList>('(');
+        std::static_pointer_cast<RalList>(mp)->add(std::make_shared<RalSymbol>("unquote"));
+        std::static_pointer_cast<RalList>(mp)->add(read_form(r));
         return mp;
     }
     else if (repr == "~@") {
         DBG << "read_atom: macro:splice-unquote >" << repr << "<\n";
-        MalTypePtr mp = std::make_shared<MalList>('(');
-        std::static_pointer_cast<MalList>(mp)->add(std::make_shared<MalSymbol>("splice-unquote"));
-        std::static_pointer_cast<MalList>(mp)->add(read_form(r));
+        RalTypePtr mp = std::make_shared<RalList>('(');
+        std::static_pointer_cast<RalList>(mp)->add(std::make_shared<RalSymbol>("splice-unquote"));
+        std::static_pointer_cast<RalList>(mp)->add(read_form(r));
         return mp;
     }
     else if (repr == "@") {
         DBG << "read_atom: macro:deref >" << repr << "<\n";
-        MalTypePtr mp = std::make_shared<MalList>('(');
-        std::static_pointer_cast<MalList>(mp)->add(std::make_shared<MalSymbol>("deref"));
-        std::static_pointer_cast<MalList>(mp)->add(read_form(r));
+        RalTypePtr mp = std::make_shared<RalList>('(');
+        std::static_pointer_cast<RalList>(mp)->add(std::make_shared<RalSymbol>("deref"));
+        std::static_pointer_cast<RalList>(mp)->add(read_form(r));
         return mp;
     }
     // expands the token "^" to return a new list that contains the symbol "with-meta" and 
@@ -220,17 +220,17 @@ MalTypePtr read_atom(Reader &r)
     // (1st argument) in that order (metadata comes first with the ^ macro and the function second).
     else if (repr == "^") {
         DBG << "read_atom: macro:with-meta >" << repr << "<\n";
-        MalTypePtr mp = std::make_shared<MalList>('(');
-        std::static_pointer_cast<MalList>(mp)->add(std::make_shared<MalSymbol>("with-meta"));
+        RalTypePtr mp = std::make_shared<RalList>('(');
+        std::static_pointer_cast<RalList>(mp)->add(std::make_shared<RalSymbol>("with-meta"));
         auto first = read_form(r);
         auto second = read_form(r);
-        std::static_pointer_cast<MalList>(mp)->add(second);
-        std::static_pointer_cast<MalList>(mp)->add(first);
+        std::static_pointer_cast<RalList>(mp)->add(second);
+        std::static_pointer_cast<RalList>(mp)->add(first);
         return mp;
     }
     else {
         DBG << "read_atom: symbol >" << repr << "<\n";
-        MalTypePtr mp = std::make_shared<MalSymbol>(repr);
+        RalTypePtr mp = std::make_shared<RalSymbol>(repr);
         return mp;
     }
 }

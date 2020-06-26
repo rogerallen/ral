@@ -24,8 +24,8 @@
 #include <iostream>
 #include <sstream>
 
-// Another windows compile issue
-#if 0
+// Another windows/Visual Studio compile issue
+#ifdef __linux__ 
 #include "linenoise.hpp"
 #else
 namespace linenoise  {

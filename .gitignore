@@ -1,6 +1,7 @@
 .vscode/
+.vs/
+bin/
 build/
+src/version.h
 history.txt
 *.log
-src/version.h
-bin/

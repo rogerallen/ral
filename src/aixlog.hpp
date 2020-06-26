@@ -528,7 +528,9 @@ public:
     }
 
 protected:
-    Log() noexcept : last_id_(-1), last_buffer_(nullptr)
+    // COMPILE ERROR in Visual Studio here
+    // error C2248: 'std::thread::id::id': cannot access private member declared in class 'std::thread::id'
+    Log() noexcept : /* last_id_(-1), */ last_buffer_(nullptr)
     {
         std::clog.rdbuf(this);
         std::clog << Severity() << Type::normal << Tag() << Function() << Conditional() << AixLog::Color::NONE << std::flush;

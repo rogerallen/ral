@@ -16,7 +16,6 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 // ======================================================================
 #include "malCore.h"
-#include "linenoise.hpp"
 #include "printer.h"
 #include "reader.h"
 #include <chrono>
@@ -24,6 +23,15 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+
+// Another windows compile issue
+#if 0
+#include "linenoise.hpp"
+#else
+namespace linenoise  {
+    bool Readline(const char*, std::string&);
+};
+#endif
 
 #if 0
 #include "aixlog.hpp"
@@ -382,12 +390,20 @@ MalTypePtr mal_slurp(MalTypeIter begin, MalTypeIter end)
     checkArgsEqual("slurp", 1, std::distance(begin, end));
     std::string filename = (*begin)->str(false);
     // https://stackoverflow.com/questions/524591/performance-of-creating-a-c-stdstring-from-an-input-iterator/524843#524843
+#if 0
     std::ifstream ifs(filename.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
     std::ifstream::pos_type fileSize = ifs.tellg();
     ifs.seekg(0, std::ios::beg);
     std::vector<char> bytes(fileSize);
+    // COMPILE ERROR in Visual Studio
+    // error C2039: 'read': is not a member of 'std::basic_ifstream<char,std::char_traits<char>>'
     ifs.read(&bytes[0], fileSize);
     std::string s = std::string(&bytes[0], fileSize);
+#else
+    // alternate that is less performant, but does not cause Visual Studio error
+    std::ifstream f(filename.c_str());
+    std::string s = std::string(std::istreambuf_iterator<char>(f), std::istreambuf_iterator<char>());
+#endif
     return std::make_shared<MalString>(s);
 }
 

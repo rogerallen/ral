@@ -361,6 +361,7 @@ std::string rep(std::string s, MalEnvPtr env)
 }
 
 // ================================================================================
+// FIXME -- move mal_eval into malCore (eval-with-env form env)?  make eval special form?
 MalTypePtr mal_eval(MalTypeIter begin, MalTypeIter end)
 {
     return EVAL(*begin, repl_env);

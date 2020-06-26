@@ -4,6 +4,12 @@ I Made a Lisp based on https://github.com/kanaka/mal
 
 There are many others like it, but this one is mine.
 
+## Notes
+
+### Windows
+- cmd.exe shell does not prompt and does not do well with Ctrl-D
+- Power Shell seems to work just fine
+
 ## License
 
 Copyright (C) 2020 Roger Allen

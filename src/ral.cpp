@@ -468,15 +468,21 @@ int main(int argc, char *argv[])
         linenoise::SetMultiLine(true);
         linenoise::SetHistoryMaxLen(50);
         linenoise::LoadHistory(path);
+        std::string prev_input("");
         while (true) {
             std::string input;
+            std::string prompt = prev_input == "" ? "user> " : "..... ";
             // FIXME: how to read a multi-line form?
-            if (linenoise::Readline("user> ", input)) {
+            if (linenoise::Readline(prompt.c_str(), input)) {
                 break;
             }
             try {
                 linenoise::AddHistory(input.c_str());
-                std::cout << rep(input, repl_env) << std::endl;
+                std::cout << rep(prev_input + input, repl_env) << std::endl;
+                prev_input = "";
+            }
+            catch (RalMissingParen& e) {
+                prev_input += input + "\n";
             }
             catch (std::exception &e) {
                 std::cerr << "ERROR: " << e.what() << std::endl;

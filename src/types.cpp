@@ -97,14 +97,14 @@ RalInteger::RalInteger(RalInteger *that)
     value_ = that->value_;
     DBG << "***Construct: copy* " << value_ << " " << this << "\n";
 }
-
+/*
 RalInteger::RalInteger(RalInteger& that)
 {
     repr_ = that.repr_;
     value_ = that.value_;
     DBG << "***Construct: copy& " << value_ << " " << this << "\n";
 }
-
+*/
 
 RalInteger::~RalInteger()
 {
@@ -118,7 +118,6 @@ std::string RalInteger::str(bool readable)
 
 RalTypePtr RalInteger::eval(RalEnvPtr env)
 {
-    //return std::make_shared<RalInteger>(RalInteger(this));
     return shared_from_this();
 }
 
@@ -154,7 +153,7 @@ std::string RalConstant::str(bool readable)
 
 RalTypePtr RalConstant::eval(RalEnvPtr env)
 {
-    return std::make_shared<RalConstant>(RalConstant(this));
+    return shared_from_this();
 }
 
 bool RalConstant::equal(RalTypePtr that)
@@ -296,7 +295,7 @@ std::string RalString::str(bool readable)
 
 RalTypePtr RalString::eval(RalEnvPtr env)
 { 
-    return std::make_shared<RalString>(RalString(this));
+    return shared_from_this();
 }
 
 bool RalString::equal(RalTypePtr that)
@@ -332,7 +331,7 @@ std::string RalKeyword::str(bool readable)
 
 RalTypePtr RalKeyword::eval(RalEnvPtr env)
 { 
-    return std::make_shared<RalKeyword>(RalKeyword(this));  
+    return shared_from_this();
 }
 
 bool RalKeyword::equal(RalTypePtr that)

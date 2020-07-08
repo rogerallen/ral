@@ -75,7 +75,7 @@ class RalInteger : public RalType {
     RalInteger(std::string s);
     RalInteger(int64_t i);
     RalInteger(RalInteger *that);
-    RalInteger(RalInteger& that);
+    /*RalInteger(RalInteger& that);*/
     ~RalInteger() override;
     RalKind kind() override { return RalKind::INTEGER; }
     std::string str(bool readable) override;

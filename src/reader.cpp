@@ -90,7 +90,7 @@ RalTypePtr read_form(Reader &r)
 // ================================================================================
 // read_list will repeatedly call read_form with the Reader object until it
 // encounters a ')' token (if it reach EOF before reading a ')' then that is an
-// error). It accumulates the results into a List type.
+// error that is thrown). It accumulates the results into a List type.
 // Now also works for the '[]' vector type and '{}' assoc arrays
 RalTypePtr read_list(Reader &r, char listStartChar)
 {
@@ -107,7 +107,7 @@ RalTypePtr read_list(Reader &r, char listStartChar)
     DBG << "read_list: start\n";
     while (true) {
         if (r.peek() == "") {
-            throw RalMissingParen(); // !!! ERROR !!!  FIXME pass listEndStr
+            throw RalMissingParen(); // !!! ERROR !!!
         }
         else if (r.peek() == listEndStr) {
             r.next(); // eat the ")" or "]" or "}"
@@ -120,7 +120,7 @@ RalTypePtr read_list(Reader &r, char listStartChar)
             else {
                 RalTypePtr keyForm = read_form(r);
                 if (r.peek() == "") {
-                    throw RalMissingParen(); // !!! ERROR !!!  FIXME pass listEndStr
+                    throw RalMissingParen(); // !!! ERROR !!!
                 }
                 else if (r.peek() == listEndStr) {
                     throw RalMissingMapValue();

@@ -81,22 +81,34 @@ RalInteger::RalInteger(std::string s)
 {
     repr_ = s;
     value_ = std::stoi(s);
+    DBG << "***Construct: str " << value_ << " " << this << "\n";
 }
 
 RalInteger::RalInteger(int64_t i)
 {
     repr_ = std::to_string(i);
     value_ = i;
+    DBG << "***Construct: int " << value_ << " " << this << "\n";
 }
 
 RalInteger::RalInteger(RalInteger *that)
 {
     repr_ = that->repr_;
     value_ = that->value_;
+    DBG << "***Construct: copy* " << value_ << " " << this << "\n";
 }
+
+RalInteger::RalInteger(RalInteger& that)
+{
+    repr_ = that.repr_;
+    value_ = that.value_;
+    DBG << "***Construct: copy& " << value_ << " " << this << "\n";
+}
+
 
 RalInteger::~RalInteger()
 {
+    DBG << "***Destruct: " << value_ << " " << this << "\n";
 }
 
 std::string RalInteger::str(bool readable)
@@ -106,7 +118,8 @@ std::string RalInteger::str(bool readable)
 
 RalTypePtr RalInteger::eval(RalEnvPtr env)
 {
-    return std::make_shared<RalInteger>(RalInteger(this));
+    //return std::make_shared<RalInteger>(RalInteger(this));
+    return shared_from_this();
 }
 
 bool RalInteger::equal(RalTypePtr that)

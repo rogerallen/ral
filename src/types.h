@@ -43,27 +43,27 @@ class RalEnv;
 typedef std::shared_ptr<RalEnv> RalEnvPtr;
 typedef std::shared_ptr<RalType> RalTypePtr;
 typedef std::vector<RalTypePtr>::iterator RalTypeIter;
-class RalType {
+class RalType : public std::enable_shared_from_this<RalType> {
   public:
-    virtual ~RalType(){};                       // remember to create a virtual destructor if you have virtual methods
+    virtual ~RalType(){}; // remember to create a virtual destructor if you have virtual methods
     virtual RalKind kind() = 0;                 // pure virtual
     virtual std::string str(bool readable) = 0; // pure virtual
     virtual RalTypePtr eval(RalEnvPtr env) = 0; // pure virtual
-    virtual bool equal(RalTypePtr that) = 0;   // pure virtual
-    // only some types implement the below functions
-    virtual RalTypePtr apply(RalTypeIter begin, RalTypeIter end); // NOT pure virtual
-    virtual std::string asMapKey();                               // NOT pure virtual
-    virtual int64_t asInt();                                          // NOT pure virtual
-    virtual bool isNilOrFalse();                                  // NOT pure virtual
-    virtual RalTypePtr getMeta();                                 // NOT pure virtual
-    virtual void setMeta(RalTypePtr meta);                        // NOT pure virtual
-    // only list methods below
-    virtual bool isList();              // NOT pure virtual
-    virtual bool isVector();            // NOT pure virtual
-    virtual bool isEmptyList();         // NOT pure virtual
-    virtual RalTypePtr apply();         // NOT pure virtual
-    virtual void setEnv(RalEnvPtr env); // NOT pure virtual
-    virtual bool is_macro_call(RalEnvPtr env); // NOT pure virtual
+    virtual bool equal(RalTypePtr that) = 0;    // pure virtual
+    // only some types implement the below functions -- they are NOT pure virtual
+    virtual RalTypePtr apply(RalTypeIter begin, RalTypeIter end); 
+    virtual std::string asMapKey();             
+    virtual int64_t asInt();                    
+    virtual bool isNilOrFalse();                
+    virtual RalTypePtr getMeta();               
+    virtual void setMeta(RalTypePtr meta);      
+    // methods below only are used in MalList
+    virtual bool isList();                      
+    virtual bool isVector();                    
+    virtual bool isEmptyList();                 
+    virtual RalTypePtr apply();                 
+    virtual void setEnv(RalEnvPtr env);         
+    virtual bool is_macro_call(RalEnvPtr env);  
 };
 
 // ================================================================================
@@ -75,6 +75,7 @@ class RalInteger : public RalType {
     RalInteger(std::string s);
     RalInteger(int64_t i);
     RalInteger(RalInteger *that);
+    RalInteger(RalInteger& that);
     ~RalInteger() override;
     RalKind kind() override { return RalKind::INTEGER; }
     std::string str(bool readable) override;

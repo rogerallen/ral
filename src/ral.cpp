@@ -481,6 +481,7 @@ int main(int argc, char *argv[])
                 std::cout << rep(prev_input + input, repl_env) << std::endl;
                 prev_input = "";
             }
+#pragma warning(suppress : 4101) // unused var 'e'
             catch (RalMissingParen& e) {
                 prev_input += input + "\n";
             }

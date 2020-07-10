@@ -390,8 +390,11 @@ RalTypePtr ral_slurp(RalTypeIter begin, RalTypeIter end)
     checkArgsEqual("slurp", 1, std::distance(begin, end));
     std::string filename = (*begin)->str(false);
     // https://stackoverflow.com/questions/524591/performance-of-creating-a-c-stdstring-from-an-input-iterator/524843#524843
-#if __linux__
+#if 1 //__linux__
     std::ifstream ifs(filename.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
+    if (!ifs.is_open()) {
+        throw RalException("file not found: " + filename);
+    }
     std::ifstream::pos_type fileSize = ifs.tellg();
     ifs.seekg(0, std::ios::beg);
     std::vector<char> bytes(fileSize);
@@ -400,6 +403,7 @@ RalTypePtr ral_slurp(RalTypeIter begin, RalTypeIter end)
     ifs.read(&bytes[0], fileSize);
     std::string s = std::string(&bytes[0], fileSize);
 #else
+    // I don't understand, but now there is no compile error in visual studio
     // FIXME -test this on windows (load-file "../tests/computations.ral")
     // alternate that is less performant, but does not cause Visual Studio error
     std::ifstream f(filename.c_str());

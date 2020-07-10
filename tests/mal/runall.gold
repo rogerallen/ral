@@ -348,25 +348,13 @@ TEST: '(read-string "\\"\\n\\"")' -> ['',"\n"] -> SUCCESS
 TEST: '(read-string "7 ;; comment")' -> ['',7] -> SUCCESS
 TEST: '(read-string ";; comment")' -> ['',] -> SUCCESS (result ignored)
 TEST: '(eval (read-string "(+ 2 3)"))' -> ['',5] -> SUCCESS
-TEST: '(slurp "../tests/test.txt")' -> ['',"A line of text\n"] -> FAIL (line 32):
-    Expected : '.*\n\\"A\\ line\\ of\\ text\\\\n\\"'
-    Got      : '(slurp "../tests/test.txt")\nERROR: std::bad_alloc'
-TEST: '(slurp "../tests/test.txt")' -> ['',"A line of text\n"] -> FAIL (line 36):
-    Expected : '.*\n\\"A\\ line\\ of\\ text\\\\n\\"'
-    Got      : '(slurp "../tests/test.txt")\nERROR: std::bad_alloc'
+TEST: '(slurp "./test.txt")' -> ['',"A line of text\n"] -> SUCCESS
+TEST: '(slurp "./test.txt")' -> ['',"A line of text\n"] -> SUCCESS
 Testing load-file
-TEST: '(load-file "../tests/inc.mal")' -> ['',nil] -> FAIL (line 41):
-    Expected : '.*\nnil'
-    Got      : '(load-file "../tests/inc.mal")\nERROR: std::bad_alloc'
-TEST: '(inc1 7)' -> ['',8] -> FAIL (line 43):
-    Expected : '.*\n8'
-    Got      : "(inc1 7)\nERROR: 'inc1' not found"
-TEST: '(inc2 7)' -> ['',9] -> FAIL (line 45):
-    Expected : '.*\n9'
-    Got      : "(inc2 7)\nERROR: 'inc2' not found"
-TEST: '(inc3 9)' -> ['',12] -> FAIL (line 47):
-    Expected : '.*\n12'
-    Got      : "(inc3 9)\nERROR: 'inc3' not found"
+TEST: '(load-file "./inc.mal")' -> ['',nil] -> SUCCESS
+TEST: '(inc1 7)' -> ['',8] -> SUCCESS
+TEST: '(inc2 7)' -> ['',9] -> SUCCESS
+TEST: '(inc3 9)' -> ['',12] -> SUCCESS
 
 Testing atoms
 TEST: '(def! inc3 (fn* (a) (+ 3 a)))' -> ['',] -> SUCCESS (result ignored)
@@ -395,15 +383,9 @@ TEST: '(g)' -> ['',0] -> SUCCESS
 
 -------- Deferrable Functionality --------
 Testing reading of large files
-TEST: '(load-file "../tests/computations.mal")' -> ['',nil] -> FAIL (line 111):
-    Expected : '.*\nnil'
-    Got      : '(load-file "../tests/computations.mal")\nERROR: std::bad_alloc'
-TEST: '(sumdown 2)' -> ['',3] -> FAIL (line 113):
-    Expected : '.*\n3'
-    Got      : "(sumdown 2)\nERROR: 'sumdown' not found"
-TEST: '(fib 2)' -> ['',1] -> FAIL (line 115):
-    Expected : '.*\n1'
-    Got      : "(fib 2)\nERROR: 'fib' not found"
+TEST: '(load-file "./computations.mal")' -> ['',nil] -> SUCCESS
+TEST: '(sumdown 2)' -> ['',3] -> SUCCESS
+TEST: '(fib 2)' -> ['',1] -> SUCCESS
 Testing `@` reader macro (short for `deref`)
 TEST: '(def! atm (atom 9))' -> ['',] -> SUCCESS (result ignored)
 TEST: '@atm' -> ['',9] -> SUCCESS
@@ -422,22 +404,12 @@ TEST: '(let* (b 12) (do (eval (read-string "(def! aa 7)")) aa ))' -> ['',7] -> S
 
 -------- Optional Functionality --------
 Testing comments in a file
-TEST: '(load-file "../tests/incB.mal")' -> ['',nil] -> SOFT FAIL (line 150):
-    Expected : '.*\nnil'
-    Got      : '(load-file "../tests/incB.mal")\nERROR: std::bad_alloc'
-TEST: '(inc4 7)' -> ['',11] -> SOFT FAIL (line 152):
-    Expected : '.*\n11'
-    Got      : "(inc4 7)\nERROR: 'inc4' not found"
-TEST: '(inc5 7)' -> ['',12] -> SOFT FAIL (line 154):
-    Expected : '.*\n12'
-    Got      : "(inc5 7)\nERROR: 'inc5' not found"
+TEST: '(load-file "./incB.mal")' -> ['',nil] -> SUCCESS
+TEST: '(inc4 7)' -> ['',11] -> SUCCESS
+TEST: '(inc5 7)' -> ['',12] -> SUCCESS
 Testing map literal across multiple lines in a file
-TEST: '(load-file "../tests/incC.mal")' -> ['',nil] -> SOFT FAIL (line 158):
-    Expected : '.*\nnil'
-    Got      : '(load-file "../tests/incC.mal")\nERROR: std::bad_alloc'
-TEST: 'mymap' -> ['',{"a" 1}] -> SOFT FAIL (line 160):
-    Expected : '.*\n\\{\\"a\\"\\ 1\\}'
-    Got      : "mymap\nERROR: 'mymap' not found"
+TEST: '(load-file "./incC.mal")' -> ['',nil] -> SUCCESS
+TEST: 'mymap' -> ['',{"a" 1}] -> SUCCESS
 Checking that eval does not use local environments.
 TEST: '(def! a 1)' -> ['',1] -> SUCCESS
 TEST: '(let* (a 2) (eval (read-string "a")))' -> ['',1] -> SUCCESS
@@ -454,54 +426,10 @@ TEST: '(read-string "1;\\\\\\\\\\\\")' -> ['',1] -> SUCCESS
 TEST: '(read-string "1;`")' -> ['',1] -> SUCCESS
 TEST: '(read-string "1; &()*+,-./:;<=>?@[]^_{|}~")' -> ['',1] -> SUCCESS
 
-FAILURES:
-FAILED TEST (line 32): (slurp "../tests/test.txt") -> ['',"A line of text\n"]:
-    Expected : '.*\n\\"A\\ line\\ of\\ text\\\\n\\"'
-    Got      : '(slurp "../tests/test.txt")\nERROR: std::bad_alloc'
-FAILED TEST (line 36): (slurp "../tests/test.txt") -> ['',"A line of text\n"]:
-    Expected : '.*\n\\"A\\ line\\ of\\ text\\\\n\\"'
-    Got      : '(slurp "../tests/test.txt")\nERROR: std::bad_alloc'
-FAILED TEST (line 41): (load-file "../tests/inc.mal") -> ['',nil]:
-    Expected : '.*\nnil'
-    Got      : '(load-file "../tests/inc.mal")\nERROR: std::bad_alloc'
-FAILED TEST (line 43): (inc1 7) -> ['',8]:
-    Expected : '.*\n8'
-    Got      : "(inc1 7)\nERROR: 'inc1' not found"
-FAILED TEST (line 45): (inc2 7) -> ['',9]:
-    Expected : '.*\n9'
-    Got      : "(inc2 7)\nERROR: 'inc2' not found"
-FAILED TEST (line 47): (inc3 9) -> ['',12]:
-    Expected : '.*\n12'
-    Got      : "(inc3 9)\nERROR: 'inc3' not found"
-FAILED TEST (line 111): (load-file "../tests/computations.mal") -> ['',nil]:
-    Expected : '.*\nnil'
-    Got      : '(load-file "../tests/computations.mal")\nERROR: std::bad_alloc'
-FAILED TEST (line 113): (sumdown 2) -> ['',3]:
-    Expected : '.*\n3'
-    Got      : "(sumdown 2)\nERROR: 'sumdown' not found"
-FAILED TEST (line 115): (fib 2) -> ['',1]:
-    Expected : '.*\n1'
-    Got      : "(fib 2)\nERROR: 'fib' not found"
-SOFT FAILED TEST (line 150): (load-file "../tests/incB.mal") -> ['',nil]:
-    Expected : '.*\nnil'
-    Got      : '(load-file "../tests/incB.mal")\nERROR: std::bad_alloc'
-SOFT FAILED TEST (line 152): (inc4 7) -> ['',11]:
-    Expected : '.*\n11'
-    Got      : "(inc4 7)\nERROR: 'inc4' not found"
-SOFT FAILED TEST (line 154): (inc5 7) -> ['',12]:
-    Expected : '.*\n12'
-    Got      : "(inc5 7)\nERROR: 'inc5' not found"
-SOFT FAILED TEST (line 158): (load-file "../tests/incC.mal") -> ['',nil]:
-    Expected : '.*\nnil'
-    Got      : '(load-file "../tests/incC.mal")\nERROR: std::bad_alloc'
-SOFT FAILED TEST (line 160): mymap -> ['',{"a" 1}]:
-    Expected : '.*\n\\{\\"a\\"\\ 1\\}'
-    Got      : "mymap\nERROR: 'mymap' not found"
-
 TEST RESULTS (for ./step6_file.mal):
-    5: soft failing tests
-    9: failing tests
-   51: passing tests
+    0: soft failing tests
+    0: failing tests
+   65: passing tests
    65: total tests
 
 ============================================================
@@ -1023,16 +951,12 @@ TEST: '(meta f-wm3)' -> ['',{"def" 2}] -> SOFT FAIL (line 272):
     Got      : "(meta f-wm3)\nERROR: 'f-wm3' not found"
 TEST: '(meta +)' -> ['',nil] -> SUCCESS
 Loading sumdown from computations.mal
-TEST: '(load-file "../tests/computations.mal")' -> ['',nil] -> SOFT FAIL (line 278):
-    Expected : '.*\nnil'
-    Got      : '(load-file "../tests/computations.mal")\nERROR: std::bad_alloc'
+TEST: '(load-file "./computations.mal")' -> ['',nil] -> SUCCESS
 
 Testing time-ms function
 TEST: '(def! start-time (time-ms))' -> ['',] -> SUCCESS (result ignored)
 TEST: '(= start-time 0)' -> ['',false] -> SUCCESS
-TEST: '(sumdown 10) ; Waste some time' -> ['',55] -> SOFT FAIL (line 286):
-    Expected : '.*\n55'
-    Got      : "(sumdown 10) ; Waste some time\nERROR: 'sumdown' not found"
+TEST: '(sumdown 10) ; Waste some time' -> ['',55] -> SUCCESS
 TEST: '(> (time-ms) start-time)' -> ['',true] -> SUCCESS
 
 Test that defining a macro does not mutate an existing function.
@@ -1047,19 +971,13 @@ FAILURES:
 SOFT FAILED TEST (line 272): (meta f-wm3) -> ['',{"def" 2}]:
     Expected : '.*\n\\{\\"def\\"\\ 2\\}'
     Got      : "(meta f-wm3)\nERROR: 'f-wm3' not found"
-SOFT FAILED TEST (line 278): (load-file "../tests/computations.mal") -> ['',nil]:
-    Expected : '.*\nnil'
-    Got      : '(load-file "../tests/computations.mal")\nERROR: std::bad_alloc'
-SOFT FAILED TEST (line 286): (sumdown 10) ; Waste some time -> ['',55]:
-    Expected : '.*\n55'
-    Got      : "(sumdown 10) ; Waste some time\nERROR: 'sumdown' not found"
 SOFT FAILED TEST (line 295): (f (+ 1 1)) -> ['',true]:
     Expected : '.*\ntrue'
     Got      : '(f (+ 1 1))\nfalse'
 
 TEST RESULTS (for ./stepA_mal.mal):
-    4: soft failing tests
+    2: soft failing tests
     0: failing tests
-  103: passing tests
+  105: passing tests
   107: total tests
 

@@ -274,7 +274,7 @@
 ;=>nil
 
 ;; Loading sumdown from computations.mal
-(load-file "../tests/computations.mal")
+(load-file "./computations.mal")
 ;=>nil
 
 ;;

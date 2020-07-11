@@ -863,7 +863,16 @@ RalTypePtr ral_time_ms(RalTypeIter begin, RalTypeIter end)
 RalTypePtr ral_meta(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual("meta", 1, std::distance(begin, end));
-    return (*begin)->getMeta();
+    auto iter = begin;
+    auto fn = *iter++;
+    switch(fn->kind()) {
+    case RalKind::LAMBDA:
+    case RalKind::LIST:
+    case RalKind::MAP:
+        return fn->getMeta();
+    default:
+        throw RalException("meta not implemented for this type");
+    }
 }
 
 // ================================================================================

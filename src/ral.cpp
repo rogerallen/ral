@@ -67,7 +67,12 @@ RalTypePtr EVAL(RalTypePtr mp, RalEnvPtr env)
         // if not list, return eval_ast(ast, env)
         if (!(mp->isList())) {
             DBG << "not list, eval_ast... " << mp->str(true) << "\n";
-            return mp->eval(env);
+            // SYMBOL eval can be a nullptr, so handle it
+            auto v = mp->eval(env);
+            if(v == nullptr) {
+                throw RalNotInEnvironment(mp->str(true));
+            }
+            return v;
         }
         // if empty[list], return ast
         if (mp->isEmptyList()) {

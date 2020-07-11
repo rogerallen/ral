@@ -860,7 +860,9 @@ TEST: '(meta f-wm)' -> ['',{"abc" 1}] -> SUCCESS
 TEST: '(def! f-wm2 ^{"abc" 1} (fn* [a] (+ 1 a)))' -> ['',] -> SUCCESS (result ignored)
 TEST: '(meta f-wm2)' -> ['',{"abc" 1}] -> SUCCESS
 Meta of native functions should return nil (not fail)
-TEST: '(meta +)' -> ['',nil] -> SUCCESS
+TEST: '(meta +)' -> ['',nil] -> SOFT FAIL (line 92):
+    Expected : '.*\nnil'
+    Got      : '(meta +)\nERROR: meta not implemented for this type'
 
 Make sure closures and metadata co-exist
 TEST: '(def! gen-plusX (fn* (x) (with-meta (fn* (b) (+ x b)) {"meta" 1})))' -> ['',] -> SUCCESS (result ignored)
@@ -944,12 +946,16 @@ TEST: '(meta (with-meta l-wm {"new_meta" 123}))' -> ['',{"new_meta" 123}] -> SUC
 TEST: '(meta l-wm)' -> ['',{"b" 2}] -> SUCCESS
 
 Testing metadata on builtin functions
-TEST: '(meta +)' -> ['',nil] -> SUCCESS
+TEST: '(meta +)' -> ['',nil] -> SOFT FAIL (line 269):
+    Expected : '.*\nnil'
+    Got      : '(meta +)\nERROR: meta not implemented for this type'
 TEST: '(def! f-wm3 ^{"def" 2} +)' -> ['',] -> SUCCESS (result ignored)
 TEST: '(meta f-wm3)' -> ['',{"def" 2}] -> SOFT FAIL (line 272):
     Expected : '.*\n\\{\\"def\\"\\ 2\\}'
     Got      : "(meta f-wm3)\nERROR: 'f-wm3' not found"
-TEST: '(meta +)' -> ['',nil] -> SUCCESS
+TEST: '(meta +)' -> ['',nil] -> SOFT FAIL (line 274):
+    Expected : '.*\nnil'
+    Got      : '(meta +)\nERROR: meta not implemented for this type'
 Loading sumdown from computations.mal
 TEST: '(load-file "./computations.mal")' -> ['',nil] -> SUCCESS
 
@@ -968,16 +974,25 @@ TEST: '(f (+ 1 1))' -> ['',true] -> SOFT FAIL (line 295):
 TEST: '(m (+ 1 1))' -> ['',false] -> SUCCESS
 
 FAILURES:
+SOFT FAILED TEST (line 92): (meta +) -> ['',nil]:
+    Expected : '.*\nnil'
+    Got      : '(meta +)\nERROR: meta not implemented for this type'
+SOFT FAILED TEST (line 269): (meta +) -> ['',nil]:
+    Expected : '.*\nnil'
+    Got      : '(meta +)\nERROR: meta not implemented for this type'
 SOFT FAILED TEST (line 272): (meta f-wm3) -> ['',{"def" 2}]:
     Expected : '.*\n\\{\\"def\\"\\ 2\\}'
     Got      : "(meta f-wm3)\nERROR: 'f-wm3' not found"
+SOFT FAILED TEST (line 274): (meta +) -> ['',nil]:
+    Expected : '.*\nnil'
+    Got      : '(meta +)\nERROR: meta not implemented for this type'
 SOFT FAILED TEST (line 295): (f (+ 1 1)) -> ['',true]:
     Expected : '.*\ntrue'
     Got      : '(f (+ 1 1))\nfalse'
 
 TEST RESULTS (for ./stepA_mal.mal):
-    2: soft failing tests
+    5: soft failing tests
     0: failing tests
-  105: passing tests
+  102: passing tests
   107: total tests
 

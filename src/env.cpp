@@ -87,6 +87,9 @@ RalEnvPtr RalEnv::find(std::string name)
     return shared_from_this();
 }
 // ================================================================================
+// NOTE: env::get used to throw exception when it could not find a symbol.
+// now it returns nullptr for a significant speedup.  Callers need to deal
+// with potential for nullptr.
 RalTypePtr RalEnv::get(std::string name)
 {
     // using find() for this is harder than just recursive get
@@ -97,7 +100,11 @@ RalTypePtr RalEnv::get(std::string name)
             return outer_->get(name);
         }
         else {
+#if 0
             throw RalNotInEnvironment(name);
+#else
+            return nullptr;
+#endif
         }
     }
     return (*it).second;

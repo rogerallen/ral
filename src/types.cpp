@@ -194,6 +194,8 @@ std::string RalSymbol::str(bool readable)
     return repr_;
 }
 
+// NOTE: Symbol::eval can return nullptr
+// caller (EVAL) needs to deal with this.
 RalTypePtr RalSymbol::eval(RalEnvPtr env)
 {
     return env->get(repr_);
@@ -498,14 +500,14 @@ bool RalList::is_macro_call(RalEnvPtr env)
 { 
     auto first = values_[0];
     if(first->kind() == RalKind::SYMBOL) {
-        try {
-            auto refers = first->eval(env);
-            if(refers->kind() == RalKind::LAMBDA) {
-                return std::static_pointer_cast<RalLambda>(refers)->get_is_macro();
-            }
-        } catch (RalNotInEnvironment e) {
-            // if not found, just return false;
+        // SYMBOL eval can be nullptr
+        auto refers = first->eval(env);
+        if(refers == nullptr) {
+            // not found in the environment, just return false
             return false;
+        }
+        else if(refers->kind() == RalKind::LAMBDA) {
+            return std::static_pointer_cast<RalLambda>(refers)->get_is_macro();
         }
     }
     return false; 

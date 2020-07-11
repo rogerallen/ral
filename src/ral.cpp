@@ -105,17 +105,19 @@ RalTypePtr EVAL(RalTypePtr mp, RalEnvPtr env)
         }
         // (defmacro! symbol value)
         else if (first == "defmacro!") {
-            DBG << "def! " << lp->str(true) << "\n";
+            DBG << "defmacro! " << lp->str(true) << "\n";
             auto symbol = lp->get(1)->str(true);
             auto value = lp->get(2);
             auto e = EVAL(value, env);
             auto lambdap = std::static_pointer_cast<RalLambda>(e);
-            lambdap->set_is_macro();
-            env->set(symbol, e); // update env
-            return e;
+            auto copyLambdap = std::make_shared<RalLambda>(new RalLambda(lambdap));
+            copyLambdap->set_is_macro();
+            env->set(symbol, copyLambdap); // update env
+            return copyLambdap;
         }
         // (macroexpand macro)
         else if (first == "macroexpand") {
+            DBG << "macroexpand " << lp->str(true) << "\n";
             return macroexpand(lp->get(1),env);
         }
         // (let* (sym1 val1 ...) form) - create new letEnv and EVAL(form,letEnv)
@@ -204,6 +206,7 @@ RalTypePtr EVAL(RalTypePtr mp, RalEnvPtr env)
         // ral environment that binds B to the value of the exception. 
         // Finally, evaluate C using that new environment.
         else if(first == "try*") {
+            DBG << "try* " << lp->str(true) << "\n";
             try {
                 auto A = lp->get(1);
                 mp = EVAL(A, env);
@@ -244,6 +247,7 @@ RalTypePtr EVAL(RalTypePtr mp, RalEnvPtr env)
                 env = std::static_pointer_cast<RalLambda>(lambda)->makeEnv(rest.begin(), rest.end());
             }
             else {
+                DBG << "non-lambda apply\n";
                 return apply(elp);
             }
         }

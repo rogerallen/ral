@@ -760,6 +760,15 @@ RalLambda::RalLambda(std::vector<RalTypePtr> binds, RalTypePtr &form, RalEnvPtr 
     meta_ = std::make_shared<RalConstant>("nil");
 }
 
+RalLambda::RalLambda(RalLambda *that)
+{
+    binds_ = that->binds_;
+    form_ = that->form_;
+    env_ = that->env_;
+    is_macro_ = that->is_macro_;
+    meta_ = that->meta_;
+}
+
 RalLambda::RalLambda(std::shared_ptr<RalLambda> that)
 {
     binds_ = that->binds_;

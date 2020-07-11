@@ -233,6 +233,7 @@ class RalLambda : public RalType {
 
   public:
     RalLambda(std::vector<RalTypePtr> binds, RalTypePtr &form, RalEnvPtr env);
+    RalLambda(RalLambda *that);
     RalLambda(std::shared_ptr<RalLambda> that);
     ~RalLambda() override;
     RalKind kind() override { return RalKind::LAMBDA; }

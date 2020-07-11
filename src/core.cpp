@@ -866,6 +866,7 @@ RalTypePtr ral_meta(RalTypeIter begin, RalTypeIter end)
     auto iter = begin;
     auto fn = *iter++;
     switch(fn->kind()) {
+    case RalKind::FUNCTION:
     case RalKind::LAMBDA:
     case RalKind::LIST:
     case RalKind::MAP:

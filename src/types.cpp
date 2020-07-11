@@ -702,6 +702,13 @@ RalFunction::RalFunction()
     meta_ = std::make_shared<RalConstant>("nil");
 }
 
+RalFunction::RalFunction(std::shared_ptr<RalFunction> that)
+{
+    name_ = that->name_;
+    fn_ = that->fn_;
+    meta_ = that->meta_;
+}
+
 RalFunction::RalFunction(std::string name, RalFunctionSignature fn)
 {
     name_ = "#<function>:"+name;

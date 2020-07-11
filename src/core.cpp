@@ -890,6 +890,10 @@ RalTypePtr ral_with_meta(RalTypeIter begin, RalTypeIter end)
     auto meta = *iter++;
     RalTypePtr mp;
     switch(fn->kind()) {
+    case RalKind::FUNCTION:
+        mp = std::make_shared<RalFunction>(std::static_pointer_cast<RalFunction>(fn));
+        mp->setMeta(meta);
+        break;
     case RalKind::LAMBDA:
         mp = std::make_shared<RalLambda>(std::static_pointer_cast<RalLambda>(fn));
         mp->setMeta(meta);

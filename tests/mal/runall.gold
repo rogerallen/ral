@@ -946,9 +946,7 @@ TEST: '(meta l-wm)' -> ['',{"b" 2}] -> SUCCESS
 Testing metadata on builtin functions
 TEST: '(meta +)' -> ['',nil] -> SUCCESS
 TEST: '(def! f-wm3 ^{"def" 2} +)' -> ['',] -> SUCCESS (result ignored)
-TEST: '(meta f-wm3)' -> ['',{"def" 2}] -> SOFT FAIL (line 272):
-    Expected : '.*\n\\{\\"def\\"\\ 2\\}'
-    Got      : "(meta f-wm3)\nERROR: 'f-wm3' not found"
+TEST: '(meta f-wm3)' -> ['',{"def" 2}] -> SUCCESS
 TEST: '(meta +)' -> ['',nil] -> SUCCESS
 Loading sumdown from computations.mal
 TEST: '(load-file "./computations.mal")' -> ['',nil] -> SUCCESS
@@ -968,16 +966,13 @@ TEST: '(f (+ 1 1))' -> ['',true] -> SOFT FAIL (line 295):
 TEST: '(m (+ 1 1))' -> ['',false] -> SUCCESS
 
 FAILURES:
-SOFT FAILED TEST (line 272): (meta f-wm3) -> ['',{"def" 2}]:
-    Expected : '.*\n\\{\\"def\\"\\ 2\\}'
-    Got      : "(meta f-wm3)\nERROR: 'f-wm3' not found"
 SOFT FAILED TEST (line 295): (f (+ 1 1)) -> ['',true]:
     Expected : '.*\ntrue'
     Got      : '(f (+ 1 1))\nfalse'
 
 TEST RESULTS (for ./stepA_mal.mal):
-    2: soft failing tests
+    1: soft failing tests
     0: failing tests
-  105: passing tests
+  106: passing tests
   107: total tests
 

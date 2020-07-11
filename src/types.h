@@ -211,6 +211,7 @@ class RalFunction : public RalType {
 
   public:
     RalFunction();
+    RalFunction(std::shared_ptr<RalFunction> that);
     RalFunction(std::string name, RalFunctionSignature fn);
     ~RalFunction() override;
     RalKind kind() override { return RalKind::FUNCTION; }

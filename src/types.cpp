@@ -2,6 +2,11 @@
 // ral - Roger Allen's Lisp via https://github.com/kanaka/mal
 // Copyright(C) 2020 Roger Allen
 // 
+// types.cpp - All of the types handled by ral.  
+// INTEGER, CONSTANT, SYMBOL, STRING, KEYWORD,
+// LIST, MAP, FUNCTION, LAMBDA, ATOM.
+//
+// ======================================================================
 // This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -42,10 +47,17 @@ RalTypePtr RalType::apply(RalTypeIter begin, RalTypeIter end) {
 }
 
 // ================================================================================
-// when using RalType for arithmentic, use this function to get the value.
-// Only integer will override this an implement it.
+// when using RalType for arithmetic, use this function to get the value.
+// Only Integer (oops, and Constant) will override this an implement it.
 int64_t RalType::asInt() {
     throw RalNoIntegerRepresentation();
+}
+
+// ================================================================================
+// when using RalType for arithmetic, use this function to get the value.
+// Only Double will override this an implement it.
+double RalType::asDouble() {
+    throw RalNoDoubleRepresentation();
 }
 
 // ================================================================================
@@ -128,6 +140,61 @@ bool RalInteger::equal(RalTypePtr that)
 }
 
 int64_t RalInteger::asInt() {
+    return value_;
+}
+
+// ================================================================================
+RalDouble::RalDouble(std::string s)
+{
+    repr_ = s;
+    value_ = std::stod(s);
+    DBG << "***Construct: str " << value_ << " " << this << "\n";
+}
+
+RalDouble::RalDouble(double d)
+{
+    repr_ = std::to_string(d);
+    value_ = d;
+    DBG << "***Construct: double " << value_ << " " << this << "\n";
+}
+
+RalDouble::RalDouble(RalDouble *that)
+{
+    repr_ = that->repr_;
+    value_ = that->value_;
+    DBG << "***Construct: copy* " << value_ << " " << this << "\n";
+}
+/*
+RalDouble::RalDouble(RalDouble& that)
+{
+    repr_ = that.repr_;
+    value_ = that.value_;
+    DBG << "***Construct: copy& " << value_ << " " << this << "\n";
+}
+*/
+
+RalDouble::~RalDouble()
+{
+    DBG << "***Destruct: " << value_ << " " << this << "\n";
+}
+
+std::string RalDouble::str(bool readable)
+{
+    return std::to_string(value_);
+}
+
+RalTypePtr RalDouble::eval(RalEnvPtr env)
+{
+    return shared_from_this();
+}
+
+bool RalDouble::equal(RalTypePtr that)
+{
+    auto b = std::static_pointer_cast<RalDouble>(that);
+    return value_ == b->asDouble();
+}
+
+double RalDouble::asDouble() {
     return value_;
 }
 

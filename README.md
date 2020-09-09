@@ -4,11 +4,31 @@ I Made a Lisp based on https://github.com/kanaka/mal
 
 There are many others like it, but this one is mine.
 
+## TODO
+
+X double numbers & math functions
+O PI math constant
+O ?read hex numbers?
+O ?float numbers & math functions?
+O ?rational numbers?
+O ?large integers?
+
+## FIXME
+
+- core.cpp
+- ral.cpp
+- reader.cpp
+- types.cpp
+
 ## Notes
 
 ### Windows
 - cmd.exe shell does not prompt and does not do well with Ctrl-D
 - Power Shell seems to work just fine
+
+### Examples
+
+(def! radians (fn* (deg) (*d 2. 3.14159268 (/d deg 360.))))
 
 ## License
 

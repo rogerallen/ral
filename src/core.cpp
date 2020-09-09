@@ -2,6 +2,11 @@
 // ral - Roger Allen's Lisp via https://github.com/kanaka/mal
 // Copyright(C) 2020 Roger Allen
 // 
+// core.cpp - core functions implemented in C++
+// each function implemnents RalFunctionSignature which 
+// takes begin & end RalTypeIter and returns RalTypePtr.
+//
+// ======================================================================
 // This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -23,6 +28,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <cmath>
 
 // Another windows/Visual Studio compile issue
 #ifdef __linux__ 
@@ -49,6 +55,13 @@ const std::map<std::string, RalFunctionSignature> RalCore::ns = {
     {"-", ral_sub},
     {"*", ral_mul},
     {"/", ral_div},
+    {"+d", ral_add_d},
+    {"-d", ral_sub_d},
+    {"*d", ral_mul_d},
+    {"/d", ral_div_d},
+    {"sqrt", ral_sqrt_d},
+    {"sin", ral_sin_d},
+    {"cos", ral_cos_d},
     {"list", ral_list},
     {"list?", ral_list_q},
     {"empty?", ral_empty_q},
@@ -119,17 +132,6 @@ void checkArgsEqual(const char *name, size_t expected, size_t num)
         throw RalException(errSS.str());
     }
 }
-#if 0
-void checkArgsBetween(const char* name, size_t min, size_t max, size_t num) 
-{
-    if((num < min) || (num > max)) {
-        std::ostringstream errSS;
-        errSS << "'" << name << "' requires between " << min << " and " << max << " parameters and " << 
-            num << " were provided."; 
-        throw RalException(errSS.str());
-    }
-}
-#endif
 void checkArgsAtLeast(const char *name, size_t min, size_t num)
 {
     if (num < min) {
@@ -211,6 +213,96 @@ RalTypePtr ral_div(RalTypeIter begin, RalTypeIter end)
         value /= (**(iter++)).asInt();
     }
     RalTypePtr mp = std::make_shared<RalInteger>(value);
+    return mp;
+}
+
+// ================================================================================
+RalTypePtr ral_add_d(RalTypeIter begin, RalTypeIter end)
+{
+    checkArgsAtLeast("+d", 1, std::distance(begin, end));
+    RalTypeIter iter = begin;
+    double value = (**(iter++)).asDouble();
+    for (; iter != end;) {
+        value += (**(iter++)).asDouble();
+    }
+    RalTypePtr mp = std::make_shared<RalDouble>(value);
+    return mp;
+}
+
+// ================================================================================
+RalTypePtr ral_sub_d(RalTypeIter begin, RalTypeIter end)
+{
+    checkArgsAtLeast("-d", 1, std::distance(begin, end));
+    RalTypeIter iter = begin;
+    double value = (**(iter++)).asDouble();
+    if (iter == end) {
+        value = -value;
+    }
+    else {
+        for (; iter != end;) {
+            value -= (**(iter++)).asDouble();
+        }
+    }
+    RalTypePtr mp = std::make_shared<RalDouble>(value);
+    return mp;
+}
+
+// ================================================================================
+RalTypePtr ral_mul_d(RalTypeIter begin, RalTypeIter end)
+{
+    checkArgsAtLeast("*d", 1, std::distance(begin, end));
+    RalTypeIter iter = begin;
+    double value = (**(iter++)).asDouble();
+    for (; iter != end;) {
+        value *= (**(iter++)).asDouble();
+    }
+    RalTypePtr mp = std::make_shared<RalDouble>(value);
+    return mp;
+}
+
+// ================================================================================
+RalTypePtr ral_div_d(RalTypeIter begin, RalTypeIter end)
+{
+    checkArgsAtLeast("/d", 1, std::distance(begin, end));
+    RalTypeIter iter = begin;
+    double value = (**(iter++)).asDouble();
+    for (; iter != end;) {
+        value /= (**(iter++)).asDouble();
+    }
+    RalTypePtr mp = std::make_shared<RalDouble>(value);
+    return mp;
+}
+
+// ================================================================================
+RalTypePtr ral_sqrt_d(RalTypeIter begin, RalTypeIter end)
+{
+    checkArgsEqual("sqrt", 1, std::distance(begin, end));
+    RalTypeIter iter = begin;
+    double value = (**(iter++)).asDouble();
+    value = sqrt(value);
+    RalTypePtr mp = std::make_shared<RalDouble>(value);
+    return mp;
+}
+
+// ================================================================================
+RalTypePtr ral_sin_d(RalTypeIter begin, RalTypeIter end)
+{
+    checkArgsEqual("sin", 1, std::distance(begin, end));
+    RalTypeIter iter = begin;
+    double value = (**(iter++)).asDouble();
+    value = sin(value);
+    RalTypePtr mp = std::make_shared<RalDouble>(value);
+    return mp;
+}
+
+// ================================================================================
+RalTypePtr ral_cos_d(RalTypeIter begin, RalTypeIter end)
+{
+    checkArgsEqual("cos", 1, std::distance(begin, end));
+    RalTypeIter iter = begin;
+    double value = (**(iter++)).asDouble();
+    value = cos(value);
+    RalTypePtr mp = std::make_shared<RalDouble>(value);
     return mp;
 }
 

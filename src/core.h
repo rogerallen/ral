@@ -2,6 +2,11 @@
 // ral - Roger Allen's Lisp via https://github.com/kanaka/mal
 // Copyright(C) 2020 Roger Allen
 // 
+// core.h - core functions implemented in C++
+// each function implemnents RalFunctionSignature which 
+// takes begin & end RalTypeIter and returns RalTypePtr.
+//
+// ======================================================================
 // This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -17,15 +22,23 @@
 // ======================================================================
 #pragma once
 
-#include "env.h"
 #include "types.h"
 #include <map>
 #include <string>
 
+// integer +-*/
 RalTypePtr ral_add(RalTypeIter begin, RalTypeIter end);
 RalTypePtr ral_sub(RalTypeIter begin, RalTypeIter end);
 RalTypePtr ral_mul(RalTypeIter begin, RalTypeIter end);
 RalTypePtr ral_div(RalTypeIter begin, RalTypeIter end);
+// explicit double +-*/
+RalTypePtr ral_add_d(RalTypeIter begin, RalTypeIter end);
+RalTypePtr ral_sub_d(RalTypeIter begin, RalTypeIter end);
+RalTypePtr ral_mul_d(RalTypeIter begin, RalTypeIter end);
+RalTypePtr ral_div_d(RalTypeIter begin, RalTypeIter end);
+RalTypePtr ral_sqrt_d(RalTypeIter begin, RalTypeIter end);
+RalTypePtr ral_sin_d(RalTypeIter begin, RalTypeIter end);
+RalTypePtr ral_cos_d(RalTypeIter begin, RalTypeIter end);
 RalTypePtr ral_list(RalTypeIter begin, RalTypeIter end);
 RalTypePtr ral_list_q(RalTypeIter begin, RalTypeIter end);
 RalTypePtr ral_empty_q(RalTypeIter begin, RalTypeIter end);
@@ -83,6 +96,7 @@ RalTypePtr ral_seq(RalTypeIter begin, RalTypeIter end);
 RalTypePtr ral_conj(RalTypeIter begin, RalTypeIter end);
 RalTypePtr ral_macro_q(RalTypeIter begin, RalTypeIter end);
 
+// RalCore::ns is for mapping from symbol string to above functions
 struct RalCore {
     static const std::map<std::string, RalFunctionSignature> ns;
 };

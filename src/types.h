@@ -2,6 +2,11 @@
 // ral - Roger Allen's Lisp via https://github.com/kanaka/mal
 // Copyright(C) 2020 Roger Allen
 // 
+// types.h - All of the types handled by ral.  
+// INTEGER, CONSTANT, SYMBOL, STRING, KEYWORD,
+// LIST, MAP, FUNCTION, LAMBDA, ATOM.
+//
+// ======================================================================
 // This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -27,7 +32,8 @@
 // ================================================================================
 enum class RalKind {
     NONE,
-    INTEGER,
+    INTEGER, 
+    DOUBLE, 
     CONSTANT,
     SYMBOL,
     STRING,
@@ -53,7 +59,8 @@ class RalType : public std::enable_shared_from_this<RalType> {
     // only some types implement the below functions -- they are NOT pure virtual
     virtual RalTypePtr apply(RalTypeIter begin, RalTypeIter end); 
     virtual std::string asMapKey();             
-    virtual int64_t asInt();                    
+    virtual int64_t asInt();
+    virtual double asDouble();                    
     virtual bool isNilOrFalse();                
     virtual RalTypePtr getMeta();               
     virtual void setMeta(RalTypePtr meta);      
@@ -82,6 +89,24 @@ class RalInteger : public RalType {
     RalTypePtr eval(RalEnvPtr env) override;
     bool equal(RalTypePtr that) override;
     int64_t asInt() override;
+};
+
+// ================================================================================
+class RalDouble : public RalType {
+    std::string repr_;
+    double value_;
+
+  public:
+    RalDouble(std::string s);
+    RalDouble(double d);
+    RalDouble(RalDouble *that);
+    /*RalDouble(RalDouble& that);*/
+    ~RalDouble() override;
+    RalKind kind() override { return RalKind::DOUBLE; }
+    std::string str(bool readable) override;
+    RalTypePtr eval(RalEnvPtr env) override;
+    bool equal(RalTypePtr that) override;
+    double asDouble() override;
 };
 
 // ================================================================================
@@ -306,6 +331,13 @@ class RalNoIntegerRepresentation : public std::exception {
     virtual const char *what() const throw()
     {
         return "no conversion to integer for this type.";
+    }
+};
+
+class RalNoDoubleRepresentation : public std::exception {
+    virtual const char *what() const throw()
+    {
+        return "no conversion to double for this type.";
     }
 };
 

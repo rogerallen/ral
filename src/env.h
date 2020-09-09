@@ -2,6 +2,11 @@
 // ral - Roger Allen's Lisp via https://github.com/kanaka/mal
 // Copyright(C) 2020 Roger Allen
 // 
+// env.h - environment class
+// this class implents holding the data for an environment and a
+// pointer to the outer environment.
+//
+// ======================================================================
 // This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -18,7 +23,6 @@
 #pragma once
 
 #include "types.h"
-
 #include <map>
 #include <string>
 #include <vector>

@@ -2,6 +2,9 @@
 // ral - Roger Allen's Lisp via https://github.com/kanaka/mal
 // Copyright(C) 2020 Roger Allen
 // 
+// reader.cpp - repl read classes & helper functions
+//
+// ======================================================================
 // This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -148,13 +151,19 @@ RalTypePtr read_list(Reader &r, char listStartChar)
 // - keyword
 // - numbers (float or double) TODO (I want to do this)
 // It also handles reader-macro expansion.
-static const std::regex integer_regex(R"([+-]\d+|\d+)"); // FIXME +/-, hex, etc.
+static const std::regex integer_regex(R"([+-]\d+|\d+)"); // TODO hex
+static const std::regex double_regex(R"([+-]\d+.|[+-]\d+.\d+|\d+.|\d+.\d+)"); 
 RalTypePtr read_atom(Reader &r)
 {
     std::string repr = r.next();
     if (std::regex_match(repr, integer_regex)) {
         DBG << "read_atom: integer >" << repr << "<\n";
         RalTypePtr mp = std::make_shared<RalInteger>(repr);
+        return mp;
+    }
+    else if (std::regex_match(repr, double_regex)) {
+        DBG << "read_atom: double >" << repr << "<\n";
+        RalTypePtr mp = std::make_shared<RalDouble>(repr);
         return mp;
     }
     else if ((repr == "") || (repr == "nil") || (repr == "true") || (repr == "false")) {

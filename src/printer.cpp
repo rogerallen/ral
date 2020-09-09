@@ -2,6 +2,9 @@
 // ral - Roger Allen's Lisp via https://github.com/kanaka/mal
 // Copyright(C) 2020 Roger Allen
 // 
+// printer.cpp - repl print function
+//
+// ======================================================================
 // This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -16,6 +19,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 // ======================================================================
 #include "printer.h"
+
+// pr_str is the main print function for the repl
 std::string pr_str(RalTypePtr m, bool print_readably)
 {
     return m->str(print_readably);

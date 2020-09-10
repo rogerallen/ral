@@ -32,6 +32,9 @@ O ?large integers?
 
 (def! radians (fn* (deg) (*d TAU (/d deg 360.))))
 
+;; SICP (define (circumference radius) (* 2 pi radius))
+(def! circumference (fn* [radius] (*d 2 PI radius)))
+
 ## License
 
 Copyright (C) 2020 Roger Allen

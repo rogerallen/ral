@@ -89,6 +89,7 @@ class RalInteger : public RalType {
     RalTypePtr eval(RalEnvPtr env) override;
     bool equal(RalTypePtr that) override;
     int64_t asInt() override;
+    double asDouble() override; // I'm not 100% sure.  90% sure this is right.
 };
 
 // ================================================================================

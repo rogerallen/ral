@@ -56,7 +56,7 @@ int64_t RalType::asInt() {
 
 // ================================================================================
 // when using RalType for arithmetic, use this function to get the value.
-// Only Double will override this an implement it.
+// Only Double (oops, and Constant & Integer) will override this an implement it.
 double RalType::asDouble() {
     throw RalNoDoubleRepresentation();
 }
@@ -142,6 +142,10 @@ bool RalInteger::equal(RalTypePtr that)
 
 int64_t RalInteger::asInt() {
     return value_;
+}
+
+double RalInteger::asDouble() {
+    return (double)value_;
 }
 
 // ================================================================================

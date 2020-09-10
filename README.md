@@ -7,7 +7,9 @@ There are many others like it, but this one is mine.
 ## TODO
 
 X double numbers & math functions
-O PI math constant
+X PI math constant & TAU, E
+O meta for documentation
+O how to do self-doc?  get list of fns from env
 O ?read hex numbers?
 O ?float numbers & math functions?
 O ?rational numbers?
@@ -28,7 +30,7 @@ O ?large integers?
 
 ### Examples
 
-(def! radians (fn* (deg) (*d 2. 3.14159268 (/d deg 360.))))
+(def! radians (fn* (deg) (*d TAU (/d deg 360.))))
 
 ## License
 

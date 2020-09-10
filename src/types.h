@@ -122,6 +122,7 @@ class RalConstant : public RalType {
     RalTypePtr eval(RalEnvPtr env) override;
     bool equal(RalTypePtr that) override;
     int64_t asInt() override;
+    double asDouble() override;
     bool isNilOrFalse() override;
 };
 

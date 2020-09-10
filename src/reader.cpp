@@ -166,7 +166,8 @@ RalTypePtr read_atom(Reader &r)
         RalTypePtr mp = std::make_shared<RalDouble>(repr);
         return mp;
     }
-    else if ((repr == "") || (repr == "nil") || (repr == "true") || (repr == "false")) {
+    else if ((repr == "") || (repr == "nil") || (repr == "true") || (repr == "false") ||
+             (repr == "PI") || (repr == "TAU") || (repr == "E")) {
         if (repr == "") {
             repr = "nil";
         }

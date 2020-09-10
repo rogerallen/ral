@@ -22,6 +22,7 @@
 // ======================================================================
 #include "types.h"
 #include "env.h"
+#include <cmath>
 
 #if 1
 #include "aixlog.hpp"
@@ -232,6 +233,28 @@ bool RalConstant::equal(RalTypePtr that)
 int64_t RalConstant::asInt()
 {
     if(repr_ == "nil") {
+        return 0;
+    }
+    else if(repr_ == "true") {
+        return 1;
+    }
+    else { // if(repr_ == "false") {
+        return 0;
+    }
+}
+
+double RalConstant::asDouble()
+{
+    if(repr_ == "PI") {
+        return M_PI; 
+    }
+    else if(repr_ == "TAU") {
+        return M_PI*2; 
+    }
+    else if(repr_ == "E") {
+        return M_E; 
+    }
+    else if(repr_ == "nil") {
         return 0;
     }
     else if(repr_ == "true") {

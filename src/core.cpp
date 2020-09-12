@@ -62,6 +62,7 @@ const std::map<std::string, RalFunctionSignature> RalCore::ns = {
     {"sqrt", ral_sqrt_d},
     {"sin", ral_sin_d},
     {"cos", ral_cos_d},
+    {"abs-d", ral_abs_d},
     {"list", ral_list},
     {"list?", ral_list_q},
     {"empty?", ral_empty_q},
@@ -71,6 +72,10 @@ const std::map<std::string, RalFunctionSignature> RalCore::ns = {
     {"<=", ral_le},
     {">", ral_gt},
     {">=", ral_ge},
+    {"<d", ral_lt_d},
+    {"<=d", ral_le_d},
+    {">d", ral_gt_d},
+    {">=d", ral_ge_d},
     {"pr-str", ral_pr_str},
     {"str", ral_str},
     {"prn", ral_prn},
@@ -307,6 +312,17 @@ RalTypePtr ral_cos_d(RalTypeIter begin, RalTypeIter end)
 }
 
 // ================================================================================
+RalTypePtr ral_abs_d(RalTypeIter begin, RalTypeIter end)
+{
+    checkArgsEqual("abs_d", 1, std::distance(begin, end));
+    RalTypeIter iter = begin;
+    double value = (**(iter++)).asDouble();
+    value = abs(value);
+    RalTypePtr mp = std::make_shared<RalDouble>(value);
+    return mp;
+}
+
+// ================================================================================
 RalTypePtr ral_list(RalTypeIter begin, RalTypeIter end)
 {
     RalTypePtr mp = std::make_shared<RalList>('(');
@@ -396,6 +412,46 @@ RalTypePtr ral_ge(RalTypeIter begin, RalTypeIter end)
     RalTypeIter iter = begin;
     int64_t a = (*iter++)->asInt();
     int64_t b = (*iter)->asInt();
+    return (a >= b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+}
+
+// ================================================================================
+RalTypePtr ral_lt_d(RalTypeIter begin, RalTypeIter end)
+{
+    checkArgsEqual("<", 2, std::distance(begin, end));
+    RalTypeIter iter = begin;
+    double a = (*iter++)->asDouble();
+    double b = (*iter)->asDouble();
+    return (a < b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+}
+
+// ================================================================================
+RalTypePtr ral_le_d(RalTypeIter begin, RalTypeIter end)
+{
+    checkArgsEqual("<=", 2, std::distance(begin, end));
+    RalTypeIter iter = begin;
+    double a = (*iter++)->asDouble();
+    double b = (*iter)->asDouble();
+    return (a <= b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+}
+
+// ================================================================================
+RalTypePtr ral_gt_d(RalTypeIter begin, RalTypeIter end)
+{
+    checkArgsEqual(">", 2, std::distance(begin, end));
+    RalTypeIter iter = begin;
+    double a = (*iter++)->asDouble();
+    double b = (*iter)->asDouble();
+    return (a > b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+}
+
+// ================================================================================
+RalTypePtr ral_ge_d(RalTypeIter begin, RalTypeIter end)
+{
+    checkArgsEqual(">=", 2, std::distance(begin, end));
+    RalTypeIter iter = begin;
+    double a = (*iter++)->asDouble();
+    double b = (*iter)->asDouble();
     return (a >= b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
 }
 

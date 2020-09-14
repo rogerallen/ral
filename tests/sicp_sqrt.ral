@@ -14,19 +14,19 @@
 ;;   (sqrt-iter 1.0 x))
 
 (def! square
-  (fn* [x] (*d x x)))
+  (fn* [x] (* x x)))
 
 (def! average
   (fn* [x y]
-    (/d (+d x y) 2)))
+    (/ (+ x y) 2.0)))
 
 (def! improve
   (fn* [guess x]
-    (average guess (/d x guess))))
+    (average guess (/ x guess))))
 
 (def! good-enough? 
   (fn* [guess x]
-    (<d (abs-d (-d (square guess) x)) 0.000001)))
+    (< (abs (- (square guess) x)) 0.000001)))
 
 (def! sqrt-iter
   (fn* [guess x]

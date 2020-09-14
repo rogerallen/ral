@@ -55,14 +55,10 @@ const std::map<std::string, RalFunctionSignature> RalCore::ns = {
     {"-", ral_sub},
     {"*", ral_mul},
     {"/", ral_div},
-    {"+d", ral_add_d},
-    {"-d", ral_sub_d},
-    {"*d", ral_mul_d},
-    {"/d", ral_div_d},
     {"sqrt", ral_sqrt_d},
     {"sin", ral_sin_d},
     {"cos", ral_cos_d},
-    {"abs-d", ral_abs_d},
+    {"abs", ral_abs},
     {"list", ral_list},
     {"list?", ral_list_q},
     {"empty?", ral_empty_q},
@@ -72,10 +68,6 @@ const std::map<std::string, RalFunctionSignature> RalCore::ns = {
     {"<=", ral_le},
     {">", ral_gt},
     {">=", ral_ge},
-    {"<d", ral_lt_d},
-    {"<=d", ral_le_d},
-    {">d", ral_gt_d},
-    {">=d", ral_ge_d},
     {"pr-str", ral_pr_str},
     {"str", ral_str},
     {"prn", ral_prn},
@@ -165,15 +157,42 @@ void checkArgsOdd(const char *name, size_t num)
 // ================================================================================
 // Core Functions
 // ================================================================================
+enum arithmetic_type { INTEGER, DOUBLE };
 RalTypePtr ral_add(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsAtLeast("+", 1, std::distance(begin, end));
     RalTypeIter iter = begin;
-    int64_t value = (**(iter++)).asInt();
-    for (; iter != end;) {
-        value += (**(iter++)).asInt();
+    arithmetic_type atype = INTEGER;
+    if((*iter)->kind() == RalKind::DOUBLE) {
+        atype = DOUBLE;
     }
-    RalTypePtr mp = std::make_shared<RalInteger>(value);
+    int64_t i_value;
+    double d_value;
+    if(atype == DOUBLE) {
+        d_value = (**(iter++)).asDouble();
+    }
+    else {
+        i_value = (**(iter++)).asInt();
+    }
+    for (; iter != end;) {
+        if((atype == INTEGER) && (*iter)->kind() == RalKind::DOUBLE) {
+            atype = DOUBLE;
+            d_value = i_value;
+        }
+        if(atype == DOUBLE) {
+            d_value += (**(iter++)).asDouble();
+        }
+        else {
+            i_value += (**(iter++)).asInt();
+        }
+    }
+    RalTypePtr mp;
+    if(atype == DOUBLE) {
+        mp = std::make_shared<RalDouble>(d_value);
+    }
+    else {
+        mp = std::make_shared<RalInteger>(i_value);
+    }
     return mp;
 }
 
@@ -182,16 +201,37 @@ RalTypePtr ral_sub(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsAtLeast("-", 1, std::distance(begin, end));
     RalTypeIter iter = begin;
-    int64_t value = (**(iter++)).asInt();
-    if (iter == end) {
-        value = -value;
+    arithmetic_type atype = INTEGER;
+    if((*iter)->kind() == RalKind::DOUBLE) {
+        atype = DOUBLE;
+    }
+    int64_t i_value;
+    double d_value;
+    if(atype == DOUBLE) {
+        d_value = (**(iter++)).asDouble();
     }
     else {
-        for (; iter != end;) {
-            value -= (**(iter++)).asInt();
+        i_value = (**(iter++)).asInt();
+    }
+    for (; iter != end;) {
+        if((atype == INTEGER) && (*iter)->kind() == RalKind::DOUBLE) {
+            atype = DOUBLE;
+            d_value = i_value;
+        }
+        if(atype == DOUBLE) {
+            d_value -= (**(iter++)).asDouble();
+        }
+        else {
+            i_value -= (**(iter++)).asInt();
         }
     }
-    RalTypePtr mp = std::make_shared<RalInteger>(value);
+    RalTypePtr mp;
+    if(atype == DOUBLE) {
+        mp = std::make_shared<RalDouble>(d_value);
+    }
+    else {
+        mp = std::make_shared<RalInteger>(i_value);
+    }
     return mp;
 }
 
@@ -200,12 +240,39 @@ RalTypePtr ral_mul(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsAtLeast("*", 1, std::distance(begin, end));
     RalTypeIter iter = begin;
-    int64_t value = (**(iter++)).asInt();
-    for (; iter != end;) {
-        value *= (**(iter++)).asInt();
+    arithmetic_type atype = INTEGER;
+    if((*iter)->kind() == RalKind::DOUBLE) {
+        atype = DOUBLE;
     }
-    RalTypePtr mp = std::make_shared<RalInteger>(value);
+    int64_t i_value;
+    double d_value;
+    if(atype == DOUBLE) {
+        d_value = (**(iter++)).asDouble();
+    }
+    else {
+        i_value = (**(iter++)).asInt();
+    }
+    for (; iter != end;) {
+        if((atype == INTEGER) && (*iter)->kind() == RalKind::DOUBLE) {
+            atype = DOUBLE;
+            d_value = i_value;
+        }
+        if(atype == DOUBLE) {
+            d_value *= (**(iter++)).asDouble();
+        }
+        else {
+            i_value *= (**(iter++)).asInt();
+        }
+    }
+    RalTypePtr mp;
+    if(atype == DOUBLE) {
+        mp = std::make_shared<RalDouble>(d_value);
+    }
+    else {
+        mp = std::make_shared<RalInteger>(i_value);
+    }
     return mp;
+
 }
 
 // ================================================================================
@@ -213,68 +280,37 @@ RalTypePtr ral_div(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsAtLeast("/", 1, std::distance(begin, end));
     RalTypeIter iter = begin;
-    int64_t value = (**(iter++)).asInt();
-    for (; iter != end;) {
-        value /= (**(iter++)).asInt();
+    arithmetic_type atype = INTEGER;
+    if((*iter)->kind() == RalKind::DOUBLE) {
+        atype = DOUBLE;
     }
-    RalTypePtr mp = std::make_shared<RalInteger>(value);
-    return mp;
-}
-
-// ================================================================================
-RalTypePtr ral_add_d(RalTypeIter begin, RalTypeIter end)
-{
-    checkArgsAtLeast("+d", 1, std::distance(begin, end));
-    RalTypeIter iter = begin;
-    double value = (**(iter++)).asDouble();
-    for (; iter != end;) {
-        value += (**(iter++)).asDouble();
-    }
-    RalTypePtr mp = std::make_shared<RalDouble>(value);
-    return mp;
-}
-
-// ================================================================================
-RalTypePtr ral_sub_d(RalTypeIter begin, RalTypeIter end)
-{
-    checkArgsAtLeast("-d", 1, std::distance(begin, end));
-    RalTypeIter iter = begin;
-    double value = (**(iter++)).asDouble();
-    if (iter == end) {
-        value = -value;
+    int64_t i_value;
+    double d_value;
+    if(atype == DOUBLE) {
+        d_value = (**(iter++)).asDouble();
     }
     else {
-        for (; iter != end;) {
-            value -= (**(iter++)).asDouble();
+        i_value = (**(iter++)).asInt();
+    }
+    for (; iter != end;) {
+        if((atype == INTEGER) && (*iter)->kind() == RalKind::DOUBLE) {
+            atype = DOUBLE;
+            d_value = i_value;
+        }
+        if(atype == DOUBLE) {
+            d_value /= (**(iter++)).asDouble();
+        }
+        else {
+            i_value /= (**(iter++)).asInt();
         }
     }
-    RalTypePtr mp = std::make_shared<RalDouble>(value);
-    return mp;
-}
-
-// ================================================================================
-RalTypePtr ral_mul_d(RalTypeIter begin, RalTypeIter end)
-{
-    checkArgsAtLeast("*d", 1, std::distance(begin, end));
-    RalTypeIter iter = begin;
-    double value = (**(iter++)).asDouble();
-    for (; iter != end;) {
-        value *= (**(iter++)).asDouble();
+    RalTypePtr mp;
+    if(atype == DOUBLE) {
+        mp = std::make_shared<RalDouble>(d_value);
     }
-    RalTypePtr mp = std::make_shared<RalDouble>(value);
-    return mp;
-}
-
-// ================================================================================
-RalTypePtr ral_div_d(RalTypeIter begin, RalTypeIter end)
-{
-    checkArgsAtLeast("/d", 1, std::distance(begin, end));
-    RalTypeIter iter = begin;
-    double value = (**(iter++)).asDouble();
-    for (; iter != end;) {
-        value /= (**(iter++)).asDouble();
+    else {
+        mp = std::make_shared<RalInteger>(i_value);
     }
-    RalTypePtr mp = std::make_shared<RalDouble>(value);
     return mp;
 }
 
@@ -312,13 +348,27 @@ RalTypePtr ral_cos_d(RalTypeIter begin, RalTypeIter end)
 }
 
 // ================================================================================
-RalTypePtr ral_abs_d(RalTypeIter begin, RalTypeIter end)
+RalTypePtr ral_abs(RalTypeIter begin, RalTypeIter end)
 {
-    checkArgsEqual("abs_d", 1, std::distance(begin, end));
+    checkArgsEqual("abs", 1, std::distance(begin, end));
     RalTypeIter iter = begin;
-    double value = (**(iter++)).asDouble();
-    value = abs(value);
-    RalTypePtr mp = std::make_shared<RalDouble>(value);
+    arithmetic_type atype = INTEGER;
+    if((*iter)->kind() == RalKind::DOUBLE) {
+        atype = DOUBLE;
+    }
+    int64_t i_value;
+    double d_value;
+    RalTypePtr mp;
+    if(atype == DOUBLE) {
+        d_value = (**(iter++)).asDouble();
+        d_value = abs(d_value);
+        mp = std::make_shared<RalDouble>(d_value);
+    }
+    else {
+        i_value = (**(iter++)).asInt();
+        i_value = (i_value < 0) ? -i_value : i_value;
+        mp = std::make_shared<RalDouble>(i_value);
+    }
     return mp;
 }
 
@@ -380,9 +430,23 @@ RalTypePtr ral_lt(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual("<", 2, std::distance(begin, end));
     RalTypeIter iter = begin;
-    int64_t a = (*iter++)->asInt();
-    int64_t b = (*iter)->asInt();
-    return (a < b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+    arithmetic_type atype = INTEGER;
+    if(((**(iter)).kind() == RalKind::DOUBLE) ||
+       ((**(iter+1)).kind() == RalKind::DOUBLE)) {
+        atype = DOUBLE;
+    }
+    RalTypePtr mp;
+    if(atype == DOUBLE) {
+        double a = (*iter++)->asDouble();
+        double b = (*iter)->asDouble();
+        mp = (a < b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+    }
+    else {
+        int64_t a = (*iter++)->asInt();
+        int64_t b = (*iter)->asInt();
+        mp = (a < b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+    }
+    return mp;
 }
 
 // ================================================================================
@@ -390,9 +454,23 @@ RalTypePtr ral_le(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual("<=", 2, std::distance(begin, end));
     RalTypeIter iter = begin;
-    int64_t a = (*iter++)->asInt();
-    int64_t b = (*iter)->asInt();
-    return (a <= b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+    arithmetic_type atype = INTEGER;
+    if(((**(iter)).kind() == RalKind::DOUBLE) ||
+       ((**(iter+1)).kind() == RalKind::DOUBLE)) {
+        atype = DOUBLE;
+    }
+    RalTypePtr mp;
+    if(atype == DOUBLE) {
+        double a = (*iter++)->asDouble();
+        double b = (*iter)->asDouble();
+        mp = (a <= b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+    }
+    else {
+        int64_t a = (*iter++)->asInt();
+        int64_t b = (*iter)->asInt();
+        mp = (a <= b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+    }
+    return mp;
 }
 
 // ================================================================================
@@ -400,9 +478,23 @@ RalTypePtr ral_gt(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual(">", 2, std::distance(begin, end));
     RalTypeIter iter = begin;
-    int64_t a = (*iter++)->asInt();
-    int64_t b = (*iter)->asInt();
-    return (a > b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+    arithmetic_type atype = INTEGER;
+    if(((**(iter)).kind() == RalKind::DOUBLE) ||
+       ((**(iter+1)).kind() == RalKind::DOUBLE)) {
+        atype = DOUBLE;
+    }
+    RalTypePtr mp;
+    if(atype == DOUBLE) {
+        double a = (*iter++)->asDouble();
+        double b = (*iter)->asDouble();
+        mp = (a > b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+    }
+    else {
+        int64_t a = (*iter++)->asInt();
+        int64_t b = (*iter)->asInt();
+        mp = (a > b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+    }
+    return mp;
 }
 
 // ================================================================================
@@ -410,49 +502,23 @@ RalTypePtr ral_ge(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual(">=", 2, std::distance(begin, end));
     RalTypeIter iter = begin;
-    int64_t a = (*iter++)->asInt();
-    int64_t b = (*iter)->asInt();
-    return (a >= b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
-}
-
-// ================================================================================
-RalTypePtr ral_lt_d(RalTypeIter begin, RalTypeIter end)
-{
-    checkArgsEqual("<", 2, std::distance(begin, end));
-    RalTypeIter iter = begin;
-    double a = (*iter++)->asDouble();
-    double b = (*iter)->asDouble();
-    return (a < b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
-}
-
-// ================================================================================
-RalTypePtr ral_le_d(RalTypeIter begin, RalTypeIter end)
-{
-    checkArgsEqual("<=", 2, std::distance(begin, end));
-    RalTypeIter iter = begin;
-    double a = (*iter++)->asDouble();
-    double b = (*iter)->asDouble();
-    return (a <= b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
-}
-
-// ================================================================================
-RalTypePtr ral_gt_d(RalTypeIter begin, RalTypeIter end)
-{
-    checkArgsEqual(">", 2, std::distance(begin, end));
-    RalTypeIter iter = begin;
-    double a = (*iter++)->asDouble();
-    double b = (*iter)->asDouble();
-    return (a > b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
-}
-
-// ================================================================================
-RalTypePtr ral_ge_d(RalTypeIter begin, RalTypeIter end)
-{
-    checkArgsEqual(">=", 2, std::distance(begin, end));
-    RalTypeIter iter = begin;
-    double a = (*iter++)->asDouble();
-    double b = (*iter)->asDouble();
-    return (a >= b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+    arithmetic_type atype = INTEGER;
+    if(((**(iter)).kind() == RalKind::DOUBLE) ||
+       ((**(iter+1)).kind() == RalKind::DOUBLE)) {
+        atype = DOUBLE;
+    }
+    RalTypePtr mp;
+    if(atype == DOUBLE) {
+        double a = (*iter++)->asDouble();
+        double b = (*iter)->asDouble();
+        mp = (a >= b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+    }
+    else {
+        int64_t a = (*iter++)->asInt();
+        int64_t b = (*iter)->asInt();
+        mp = (a >= b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+    }
+    return mp;
 }
 
 // ================================================================================

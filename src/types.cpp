@@ -152,7 +152,18 @@ double RalInteger::asDouble() {
 RalDouble::RalDouble(std::string s)
 {
     repr_ = s;
-    value_ = std::stod(s);
+    if(repr_ == "PI") {
+        value_ = M_PI; 
+    }
+    else if(repr_ == "TAU") {
+        value_ = M_PI*2; 
+    }
+    else if(repr_ == "E") {
+        value_ = M_E; 
+    }
+    else {
+        value_ = std::stod(s);
+    }
     DBG << "***Construct: str " << value_ << " " << this << "\n";
 }
 
@@ -249,16 +260,7 @@ int64_t RalConstant::asInt()
 
 double RalConstant::asDouble()
 {
-    if(repr_ == "PI") {
-        return M_PI; 
-    }
-    else if(repr_ == "TAU") {
-        return M_PI*2; 
-    }
-    else if(repr_ == "E") {
-        return M_E; 
-    }
-    else if(repr_ == "nil") {
+    if(repr_ == "nil") {
         return 0;
     }
     else if(repr_ == "true") {

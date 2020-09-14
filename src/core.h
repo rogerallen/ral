@@ -26,28 +26,20 @@
 #include <map>
 #include <string>
 
-// integer +-*/
+// integer/double math
 RalTypePtr ral_add(RalTypeIter begin, RalTypeIter end);
 RalTypePtr ral_sub(RalTypeIter begin, RalTypeIter end);
 RalTypePtr ral_mul(RalTypeIter begin, RalTypeIter end);
 RalTypePtr ral_div(RalTypeIter begin, RalTypeIter end);
+RalTypePtr ral_abs(RalTypeIter begin, RalTypeIter end);
 RalTypePtr ral_lt(RalTypeIter begin, RalTypeIter end);
 RalTypePtr ral_le(RalTypeIter begin, RalTypeIter end);
 RalTypePtr ral_gt(RalTypeIter begin, RalTypeIter end);
 RalTypePtr ral_ge(RalTypeIter begin, RalTypeIter end);
-// explicit double +-*/
-RalTypePtr ral_add_d(RalTypeIter begin, RalTypeIter end);
-RalTypePtr ral_sub_d(RalTypeIter begin, RalTypeIter end);
-RalTypePtr ral_mul_d(RalTypeIter begin, RalTypeIter end);
-RalTypePtr ral_div_d(RalTypeIter begin, RalTypeIter end);
-RalTypePtr ral_lt_d(RalTypeIter begin, RalTypeIter end);
-RalTypePtr ral_le_d(RalTypeIter begin, RalTypeIter end);
-RalTypePtr ral_gt_d(RalTypeIter begin, RalTypeIter end);
-RalTypePtr ral_ge_d(RalTypeIter begin, RalTypeIter end);
+// double math
 RalTypePtr ral_sqrt_d(RalTypeIter begin, RalTypeIter end);
 RalTypePtr ral_sin_d(RalTypeIter begin, RalTypeIter end);
 RalTypePtr ral_cos_d(RalTypeIter begin, RalTypeIter end);
-RalTypePtr ral_abs_d(RalTypeIter begin, RalTypeIter end);
 // non-math
 RalTypePtr ral_list(RalTypeIter begin, RalTypeIter end);
 RalTypePtr ral_list_q(RalTypeIter begin, RalTypeIter end);

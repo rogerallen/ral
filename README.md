@@ -30,10 +30,8 @@ O ?large integers?
 
 ### Examples
 
-(def! radians (fn* (deg) (*d TAU (/d deg 360.))))
-
-;; SICP (define (circumference radius) (* 2 pi radius))
-(def! circumference (fn* [radius] (*d 2 PI radius)))
+(def! radians (fn* (deg) (* TAU (/ deg 360.))))
+(def! circumference (fn* [radius] (* 2 PI radius)))
 
 ## License
 

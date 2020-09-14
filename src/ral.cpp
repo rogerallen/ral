@@ -401,6 +401,7 @@ void setup_repl_env(std::vector<std::string> args)
     rep("(defmacro! cond (fn* (& xs) (if (> (count xs) 0) (list 'if (first xs) (if (> (count xs) 1) (nth xs 1) (throw \"odd number of forms to cond\")) (cons 'cond (rest (rest xs)))))))", repl_env);
     rep("(def! radians (fn* (deg) (* TAU (/ deg 360.))))", repl_env);
     rep("(def! degrees (fn* (rad) (* 360. (/ rad TAU))))", repl_env);
+    rep("(defmacro! defn! (fn* (name args body) `(def! ~name (fn* ~args ~body))))", repl_env);
 }
 
 // this needs more work

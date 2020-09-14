@@ -29,9 +29,12 @@ O ?large integers?
 - Power Shell seems to work just fine
 
 ### Examples
-
+ 
+(def! a-number 7334)
+(def! another-number 73.34)
+(def! a-string "hello")
 (def! radians (fn* (deg) (* TAU (/ deg 360.))))
-(def! circumference (fn* [radius] (* 2 PI radius)))
+(defn! circumference [radius] (* 2 PI radius)))
 
 ## License
 

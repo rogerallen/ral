@@ -171,7 +171,7 @@ RalTypePtr ral_add(RalTypeIter begin, RalTypeIter end)
     for (; iter != end;) {
         if((atype == INTEGER) && (*iter)->kind() == RalKind::DOUBLE) {
             atype = DOUBLE;
-            d_value = i_value;
+            d_value = (double)i_value;
         }
         if(atype == DOUBLE) {
             d_value += (**(iter++)).asDouble();
@@ -210,7 +210,7 @@ RalTypePtr ral_sub(RalTypeIter begin, RalTypeIter end)
     for (; iter != end;) {
         if((atype == INTEGER) && (*iter)->kind() == RalKind::DOUBLE) {
             atype = DOUBLE;
-            d_value = i_value;
+            d_value = (double)i_value;
         }
         if(atype == DOUBLE) {
             d_value -= (**(iter++)).asDouble();
@@ -249,7 +249,7 @@ RalTypePtr ral_mul(RalTypeIter begin, RalTypeIter end)
     for (; iter != end;) {
         if((atype == INTEGER) && (*iter)->kind() == RalKind::DOUBLE) {
             atype = DOUBLE;
-            d_value = i_value;
+            d_value = (double)i_value;
         }
         if(atype == DOUBLE) {
             d_value *= (**(iter++)).asDouble();
@@ -289,7 +289,7 @@ RalTypePtr ral_div(RalTypeIter begin, RalTypeIter end)
     for (; iter != end;) {
         if((atype == INTEGER) && (*iter)->kind() == RalKind::DOUBLE) {
             atype = DOUBLE;
-            d_value = i_value;
+            d_value = (double)i_value;
         }
         if(atype == DOUBLE) {
             d_value /= (**(iter++)).asDouble();
@@ -361,7 +361,7 @@ RalTypePtr ral_abs(RalTypeIter begin, RalTypeIter end)
     else {
         i_value = (**(iter++)).asInt();
         i_value = (i_value < 0) ? -i_value : i_value;
-        mp = std::make_shared<RalDouble>(i_value);
+        mp = std::make_shared<RalDouble>((double)i_value);
     }
     return mp;
 }

@@ -24,9 +24,13 @@ O ?large integers?
 
 ## Notes
 
-### Windows
-- cmd.exe shell does not prompt and does not do well with Ctrl-D
-- Power Shell seems to work just fine
+Seems to work on Windows via Visual Studio 2019, g++ on WSL2 Ubuntu 20.04 and normal Ubuntu 20.04.
+
+Tests don't run on Windows because they require python and I don't feel like getting that working.
+
+Add from 1 to 3 "-v" args to the commandline to get INFO, DEBUG & even moar DEBUG info.
+
+Add a file to the commandline to run it.
 
 ### Examples
  

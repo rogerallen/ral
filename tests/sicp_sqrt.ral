@@ -38,5 +38,5 @@
   (fn* [x]
     (sqrt-iter 1.0 x)))
 
-(println "sicp-sqrt" (sicp-sqrt 13524.))
-(println "sqrt     " (sqrt 13524.))
+(println "sicp-sqrt" (sicp-sqrt 15241.57875))
+(println "sqrt     " (sqrt 15241.57875))

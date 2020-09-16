@@ -615,21 +615,6 @@ bool RalList::is_macro_call(RalEnvPtr env)
     return false; 
 }
 
-// FIXME DELETE
-// handle do special form
-RalTypePtr RalList::doList(RalEnvPtr env) 
-{ 
-    // EVAL() all items in the list, returning the last one
-    // instructions say eval_ast, but EVAL is needed
-    RalTypePtr mp;
-    auto iter = values_.begin();
-    iter++; // eat the "do"
-    for(; iter != values_.end(); iter++) {
-        mp = EVAL(*iter, env);
-    }
-    return mp; 
-}
-
 size_t RalList::size()
 {
     return values_.size();

@@ -23,7 +23,6 @@ O ?large integers?
   - reconsider ral_eval() loc
 - types.cpp
   - throw error on apply not to list
-  - delete RalList doList()
   - RalFunction::eval()
   - RalLambda::eval(), equal()
   - RalAtom::eval(), equal()

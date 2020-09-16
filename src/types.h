@@ -198,7 +198,6 @@ class RalList : public RalType {
     bool isEmptyList() override;
     void setEnv(RalEnvPtr env) override;
     virtual bool is_macro_call(RalEnvPtr env) override;
-    RalTypePtr doList(RalEnvPtr env);
     RalTypePtr get(size_t i);
     size_t size();
     RalTypePtr getMeta() override;

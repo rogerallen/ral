@@ -143,8 +143,7 @@ RalTypePtr EVAL(RalTypePtr mp, RalEnvPtr env)
         // (do ...)
         else if (first == "do") {
             DBG << "do " << lp->str(true);
-            //return lp->doList(env);
-            // okay, instead of packaging up the items as a list & passing
+            // instead of packaging up the items as a list & passing
             // them to eval_ast (which doesn't exist) I'll just do what
             // eval_ast would do which is EVAL each item. (but the last)
             size_t size = lp->size();
@@ -164,11 +163,9 @@ RalTypePtr EVAL(RalTypePtr mp, RalEnvPtr env)
             auto false_form = lp->get(3);
             auto emp = EVAL(condition, env);
             if (!(emp->isNilOrFalse())) {
-                //return EVAL(true_form, env);
                 mp = true_form; // TCO
             }
             else {
-                //return EVAL(false_form, env);
                 mp = false_form; // TCO
             }
         }

@@ -499,7 +499,6 @@ int main(int argc, char *argv[])
         while (true) {
             std::string input;
             std::string prompt = prev_input == "" ? "user> " : "..... ";
-            // FIXME: how to read a multi-line form?
             if (linenoise::Readline(prompt.c_str(), input)) {
                 break;
             }

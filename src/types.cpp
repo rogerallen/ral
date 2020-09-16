@@ -87,10 +87,10 @@ void RalType::setMeta(RalTypePtr meta)
 
 // ================================================================================
 // overrides for only the list type 
-// ???FIXME??? throw Error? -- only when static analysis cannot confirm no issue.
 bool RalType::isList() { return false; }
 bool RalType::isVector() { return false; }
 bool RalType::isEmptyList() { return false; }
+// ???FIXME??? throw Error? -- only when static analysis cannot confirm no issue.
 RalTypePtr RalType::apply() { return nullptr; }
 void RalType::setEnv(RalEnvPtr env) { throw RalBadSetEnv(); }
 bool RalType::is_macro_call(RalEnvPtr env) { return false; }

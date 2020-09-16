@@ -5,7 +5,7 @@ I Made a Lisp based on https://github.com/kanaka/mal
 There are many others like it, but this one is mine.
 
 ## TODO
-
+```
 X double numbers & math functions
 X PI math constant & TAU, E
 O meta for documentation
@@ -14,7 +14,7 @@ O ?read hex numbers?
 O ?float numbers & math functions?
 O ?rational numbers?
 O ?large integers?
-
+```
 ## FIXME
 
 - core.cpp
@@ -33,13 +33,13 @@ Add from 1 to 3 "-v" args to the commandline to get INFO, DEBUG & even moar DEBU
 Add a file to the commandline to run it.
 
 ### Examples
- 
+``` 
 (def! a-number 7334)
 (def! another-number 73.34)
 (def! a-string "hello")
 (def! radians (fn* (deg) (* TAU (/ deg 360.))))
 (defn! circumference [radius] (* 2 PI radius)))
-
+```
 ## License
 
 Copyright (C) 2020 Roger Allen

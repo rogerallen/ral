@@ -53,16 +53,40 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-### Uses aixlog.hpp
+### Uses easylogging++
 
-https://github.com/badaix/aixlog
-Copyright (C) 2017-2020 Johannes Pohl
-This software may be modified and distributed under the terms
-of the MIT license.  See the LICENSE file for details.
+https://github.com/amrayn/easyloggingpp
+
+The MIT License (MIT)
+
+Copyright (c) 2012-2018 Amrayn Web Services
+Copyright (c) 2012-2018 @abumusamq
+
+https://github.com/amrayn/
+https://amrayn.com
+https://muflihun.com
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ### Uses linenoise.hpp
 
 https://github.com/yhirose/cpp-linenoise
+
 All credits and commendations have to go to the authors of the
 following excellent libraries.
 

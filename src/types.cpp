@@ -21,14 +21,13 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 // ======================================================================
 #include "types.h"
+#include "easylogging++.h"
+#include "logging.h"
 #include "env.h"
 #include <cmath>
 
-#if 1
-#include "aixlog.hpp"
 extern bool gDebug;
-#define DBG LOG(DEBUG) << COND(gDebug)
-#endif
+extern bool gDebug2;
 
 RalTypePtr EVAL(RalTypePtr mp, RalEnvPtr env);
 
@@ -94,34 +93,34 @@ RalInteger::RalInteger(std::string s)
 {
     repr_ = s;
     value_ = std::stoi(s);
-    DBG << "***Construct: str " << value_ << " " << this << "\n";
+    DBG2 << "***Construct: str " << value_ << " " << this;
 }
 
 RalInteger::RalInteger(int64_t i)
 {
     repr_ = std::to_string(i);
     value_ = i;
-    DBG << "***Construct: int " << value_ << " " << this << "\n";
+    DBG2 << "***Construct: int " << value_ << " " << this;
 }
 
 RalInteger::RalInteger(RalInteger *that)
 {
     repr_ = that->repr_;
     value_ = that->value_;
-    DBG << "***Construct: copy* " << value_ << " " << this << "\n";
+    DBG2 << "***Construct: copy* " << value_ << " " << this;
 }
 /*
 RalInteger::RalInteger(RalInteger& that)
 {
     repr_ = that.repr_;
     value_ = that.value_;
-    DBG << "***Construct: copy& " << value_ << " " << this << "\n";
+    DBG2 << "***Construct: copy& " << value_ << " " << this;
 }
 */
 
 RalInteger::~RalInteger()
 {
-    DBG << "***Destruct: " << value_ << " " << this << "\n";
+    DBG2 << "***Destruct: " << value_ << " " << this;
 }
 
 std::string RalInteger::str(bool readable)
@@ -164,34 +163,34 @@ RalDouble::RalDouble(std::string s)
     else {
         value_ = std::stod(s);
     }
-    DBG << "***Construct: str " << value_ << " " << this << "\n";
+    DBG2 << "***Construct: str " << value_ << " " << this;
 }
 
 RalDouble::RalDouble(double d)
 {
     repr_ = std::to_string(d);
     value_ = d;
-    DBG << "***Construct: double " << value_ << " " << this << "\n";
+    DBG2 << "***Construct: double " << value_ << " " << this;
 }
 
 RalDouble::RalDouble(RalDouble *that)
 {
     repr_ = that->repr_;
     value_ = that->value_;
-    DBG << "***Construct: copy* " << value_ << " " << this << "\n";
+    DBG2 << "***Construct: copy* " << value_ << " " << this;
 }
 /*
 RalDouble::RalDouble(RalDouble& that)
 {
     repr_ = that.repr_;
     value_ = that.value_;
-    DBG << "***Construct: copy& " << value_ << " " << this << "\n";
+    DBG2 << "***Construct: copy& " << value_ << " " << this;
 }
 */
 
 RalDouble::~RalDouble()
 {
-    DBG << "***Destruct: " << value_ << " " << this << "\n";
+    DBG2 << "***Destruct: " << value_ << " " << this;
 }
 
 std::string RalDouble::str(bool readable)
@@ -667,7 +666,7 @@ std::string RalMap::str(bool readable)
             s += k.first.substr(1);
         }
         else {
-            //DBG << ">" << k.first << "<\n";
+            //DBG << ">" << k.first;
             s += "\""+k.first+"\"";
         }
         s += " ";
@@ -739,10 +738,10 @@ RalTypePtr RalMap::get(RalTypePtr k)
 void RalMap::remove(RalTypePtr k)
 {
     auto key = k->asMapKey();
-    DBG << "key = >" << key << "<\n";
+    DBG << "key = >" << key;
     auto pos = values_.find(key);
     if(pos != values_.end()) {
-        DBG << "ERASED\n";
+        DBG << "ERASED";
         values_.erase(pos);
     }
 }

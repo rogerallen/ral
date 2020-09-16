@@ -5,4 +5,5 @@ configure_file (
 
 add_executable(ral 
     "ral.cpp" "core.cpp" "env.cpp" "printer.cpp" 
-    "reader.cpp" "types.cpp")
+    "reader.cpp" "types.cpp"
+    "easylogging++.cpp")

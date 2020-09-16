@@ -19,12 +19,12 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 // ======================================================================
 #include "reader.h"
-#include "aixlog.hpp"
+#include "easylogging++.h"
+#include "logging.h"
 #include <iostream>
 #include <regex>
 
 extern bool gDebug;
-#define DBG LOG(DEBUG) << COND(gDebug)
 
 // ================================================================================
 // Reader Class
@@ -107,7 +107,7 @@ RalTypePtr read_list(Reader &r, char listStartChar)
     else {
         mp = std::make_shared<RalMap>();
     }
-    DBG << "read_list: start\n";
+    DBG << "read_list: start";
     while (true) {
         if (r.peek() == "") {
             throw RalMissingParen(); // !!! ERROR !!!
@@ -137,7 +137,7 @@ RalTypePtr read_list(Reader &r, char listStartChar)
             }
         }
     }
-    DBG << "read_list: end\n";
+    DBG << "read_list: end";
     return mp;
 }
 
@@ -157,17 +157,17 @@ RalTypePtr read_atom(Reader &r)
 {
     std::string repr = r.next();
     if (std::regex_match(repr, integer_regex)) {
-        DBG << "read_atom: integer >" << repr << "<\n";
+        DBG << "read_atom: integer >" << repr;
         RalTypePtr mp = std::make_shared<RalInteger>(repr);
         return mp;
     }
     else if (std::regex_match(repr, double_regex)) {
-        DBG << "read_atom: double >" << repr << "<\n";
+        DBG << "read_atom: double >" << repr;
         RalTypePtr mp = std::make_shared<RalDouble>(repr);
         return mp;
     }
     else if ((repr == "PI") || (repr == "TAU") || (repr == "E")) {
-        DBG << "read_atom: double-constant >" << repr << "<\n";
+        DBG << "read_atom: double-constant >" << repr;
         RalTypePtr mp = std::make_shared<RalDouble>(repr);
         return mp;
     }
@@ -175,7 +175,7 @@ RalTypePtr read_atom(Reader &r)
         if (repr == "") {
             repr = "nil";
         }
-        DBG << "read_atom: constant >" << repr << "<\n";
+        DBG << "read_atom: constant >" << repr;
         RalTypePtr mp = std::make_shared<RalConstant>(repr);
         return mp;
     }
@@ -183,47 +183,47 @@ RalTypePtr read_atom(Reader &r)
         if ((repr.length() == 1) || (repr[repr.size() - 1] != '"')) {
             throw RalMissingQuote();
         }
-        DBG << "read_atom: string raw>" << repr << "<\n";
+        DBG << "read_atom: string raw>" << repr;
         repr = transformToPrintable(repr);
-        DBG << "read_atom: string xfm>" << repr << "<\n";
+        DBG << "read_atom: string xfm>" << repr;
         RalTypePtr mp = std::make_shared<RalString>(repr);
         return mp;
     }
     else if (repr[0] == ':') {
-        DBG << "read_atom: keyword >" << repr << "<\n";
+        DBG << "read_atom: keyword >" << repr;
         RalTypePtr mp = std::make_shared<RalKeyword>(repr);
         return mp;
     }
     else if (repr == "'") {
-        DBG << "read_atom: macro:quote >" << repr << "<\n";
+        DBG << "read_atom: macro:quote >" << repr;
         RalTypePtr mp = std::make_shared<RalList>('(');
         std::static_pointer_cast<RalList>(mp)->add(std::make_shared<RalSymbol>("quote"));
         std::static_pointer_cast<RalList>(mp)->add(read_form(r));
         return mp;
     }
     else if (repr == "`") {
-        DBG << "read_atom: macro:quasiquote >" << repr << "<\n";
+        DBG << "read_atom: macro:quasiquote >" << repr;
         RalTypePtr mp = std::make_shared<RalList>('(');
         std::static_pointer_cast<RalList>(mp)->add(std::make_shared<RalSymbol>("quasiquote"));
         std::static_pointer_cast<RalList>(mp)->add(read_form(r));
         return mp;
     }
     else if (repr == "~") {
-        DBG << "read_atom: macro:unquote >" << repr << "<\n";
+        DBG << "read_atom: macro:unquote >" << repr;
         RalTypePtr mp = std::make_shared<RalList>('(');
         std::static_pointer_cast<RalList>(mp)->add(std::make_shared<RalSymbol>("unquote"));
         std::static_pointer_cast<RalList>(mp)->add(read_form(r));
         return mp;
     }
     else if (repr == "~@") {
-        DBG << "read_atom: macro:splice-unquote >" << repr << "<\n";
+        DBG << "read_atom: macro:splice-unquote >" << repr;
         RalTypePtr mp = std::make_shared<RalList>('(');
         std::static_pointer_cast<RalList>(mp)->add(std::make_shared<RalSymbol>("splice-unquote"));
         std::static_pointer_cast<RalList>(mp)->add(read_form(r));
         return mp;
     }
     else if (repr == "@") {
-        DBG << "read_atom: macro:deref >" << repr << "<\n";
+        DBG << "read_atom: macro:deref >" << repr;
         RalTypePtr mp = std::make_shared<RalList>('(');
         std::static_pointer_cast<RalList>(mp)->add(std::make_shared<RalSymbol>("deref"));
         std::static_pointer_cast<RalList>(mp)->add(read_form(r));
@@ -233,7 +233,7 @@ RalTypePtr read_atom(Reader &r)
     // the result of reading the next next form (2nd argument) (read_form) and the next form 
     // (1st argument) in that order (metadata comes first with the ^ macro and the function second).
     else if (repr == "^") {
-        DBG << "read_atom: macro:with-meta >" << repr << "<\n";
+        DBG << "read_atom: macro:with-meta >" << repr;
         RalTypePtr mp = std::make_shared<RalList>('(');
         std::static_pointer_cast<RalList>(mp)->add(std::make_shared<RalSymbol>("with-meta"));
         auto first = read_form(r);
@@ -243,7 +243,7 @@ RalTypePtr read_atom(Reader &r)
         return mp;
     }
     else {
-        DBG << "read_atom: symbol >" << repr << "<\n";
+        DBG << "read_atom: symbol >" << repr;
         RalTypePtr mp = std::make_shared<RalSymbol>(repr);
         return mp;
     }
@@ -254,7 +254,7 @@ RalTypePtr read_atom(Reader &r)
 static const std::regex token_regex(R"([\s,]*(~@|[\[\]{}()'`~^@]|\"(?:\\.|[^\\\"])*\"?|;.*|[^\s\[\]{}('\"`,;)]+))");
 std::vector<std::string> tokenize(std::string s)
 {
-    DBG << "tokenize: >" << s << "<\n";
+    DBG << "tokenize: >" << s;
     std::vector<std::string> tokens;
     std::smatch matches;
     while (std::regex_search(s, matches, token_regex)) {
@@ -269,6 +269,5 @@ std::vector<std::string> tokenize(std::string s)
     for (auto t : tokens) {
         DBG << " >" << t << "<";
     }
-    DBG << "\n";
     return tokens;
 }

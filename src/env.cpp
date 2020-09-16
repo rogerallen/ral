@@ -21,12 +21,10 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 // ======================================================================
 #include "env.h"
+#include "easylogging++.h"
+#include "logging.h"
 
-#include "aixlog.hpp"
 extern bool gDebug;
-#define DBG LOG(DEBUG) << COND(gDebug)
-
-//#include <iostream>
 
 // ================================================================================
 RalEnv::RalEnv()

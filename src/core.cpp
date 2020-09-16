@@ -39,12 +39,6 @@ namespace linenoise  {
 };
 #endif
 
-#if 0
-#include "aixlog.hpp"
-extern bool gDebug;
-#define DBG LOG(DEBUG) << COND(gDebug)
-#endif
-
 RalTypePtr apply(RalTypePtr mp);
 
 // ================================================================================

@@ -11,6 +11,10 @@ def Fibonacci(n):
         return Fibonacci(n-1)+Fibonacci(n-2)
 
 print("fib 1 =",Fibonacci(1))
+print("fib 2 =",Fibonacci(2))
+print("fib 3 =",Fibonacci(3))
+print("fib 4 =",Fibonacci(4))
+print("fib 5 =",Fibonacci(5))
 print("fib 10 =",Fibonacci(10))
 print("fib 20 =",Fibonacci(20))
 print("fib 25 =",Fibonacci(25))

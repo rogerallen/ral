@@ -17,8 +17,6 @@ O ?large integers?
 ```
 ## FIXME
 
-- core.cpp
-  - look at ral_slurp().  I think all is well with windows now.  confirm
 - ral.cpp
   - make repl_env global into self-contained class. perhaps a thread? 
   - reconsider apply() to not use list, rather begin/end ptrs?
@@ -29,7 +27,7 @@ O ?large integers?
   - RalFunction::eval()
   - RalLambda::eval(), equal()
   - RalAtom::eval(), equal()
-  
+
 
 ## Notes
 

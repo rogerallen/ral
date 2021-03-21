@@ -1,7 +1,7 @@
 // ======================================================================
 // ral - Roger Allen's Lisp via https://github.com/kanaka/mal
 // Copyright(C) 2020 Roger Allen
-// 
+//
 // reader.cpp - repl read classes & helper functions
 //
 // ======================================================================
@@ -9,12 +9,12 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 // ======================================================================
@@ -74,9 +74,9 @@ RalTypePtr read_str(std::string s)
 
 // ================================================================================
 // read_form will peek at the first token in the Reader object and switch on the
-// first character of that token. If the character is a left paren then read_list
-// is called with the Reader object. Otherwise, read_atom is called with the Reader
-// Object. The return value from read_form is a mal data type.
+// first character of that token. If the character is a left paren then
+// read_list is called with the Reader object. Otherwise, read_atom is called
+// with the Reader Object. The return value from read_form is a mal data type.
 RalTypePtr read_form(Reader &r)
 {
     std::string firstToken = r.peek();
@@ -99,7 +99,8 @@ RalTypePtr read_list(Reader &r, char listStartChar)
 {
     bool listNotMap = listStartChar != '{';
     RalTypePtr mp;
-    std::string listEndStr = listStartChar == '(' ? ")" : (listStartChar == '[' ? "]" : "}");
+    std::string listEndStr =
+        listStartChar == '(' ? ")" : (listStartChar == '[' ? "]" : "}");
     r.next(); // eat the "(" or "[" or "{" char
     if (listNotMap) {
         mp = std::make_shared<RalList>(listStartChar);
@@ -152,7 +153,7 @@ RalTypePtr read_list(Reader &r, char listStartChar)
 // - numbers (float or double) TODO (I want to do this)
 // It also handles reader-macro expansion.
 static const std::regex integer_regex(R"([+-]\d+|\d+)"); // TODO hex
-static const std::regex double_regex(R"([+-]\d+.|[+-]\d+.\d+|\d+.|\d+.\d+)"); 
+static const std::regex double_regex(R"([+-]\d+.|[+-]\d+.\d+|\d+.|\d+.\d+)");
 RalTypePtr read_atom(Reader &r)
 {
     std::string repr = r.next();
@@ -171,7 +172,8 @@ RalTypePtr read_atom(Reader &r)
         RalTypePtr mp = std::make_shared<RalDouble>(repr);
         return mp;
     }
-    else if ((repr == "") || (repr == "nil") || (repr == "true") || (repr == "false")) {
+    else if ((repr == "") || (repr == "nil") || (repr == "true") ||
+             (repr == "false")) {
         if (repr == "") {
             repr = "nil";
         }
@@ -197,45 +199,52 @@ RalTypePtr read_atom(Reader &r)
     else if (repr == "'") {
         DBG << "read_atom: macro:quote >" << repr;
         RalTypePtr mp = std::make_shared<RalList>('(');
-        std::static_pointer_cast<RalList>(mp)->add(std::make_shared<RalSymbol>("quote"));
+        std::static_pointer_cast<RalList>(mp)->add(
+            std::make_shared<RalSymbol>("quote"));
         std::static_pointer_cast<RalList>(mp)->add(read_form(r));
         return mp;
     }
     else if (repr == "`") {
         DBG << "read_atom: macro:quasiquote >" << repr;
         RalTypePtr mp = std::make_shared<RalList>('(');
-        std::static_pointer_cast<RalList>(mp)->add(std::make_shared<RalSymbol>("quasiquote"));
+        std::static_pointer_cast<RalList>(mp)->add(
+            std::make_shared<RalSymbol>("quasiquote"));
         std::static_pointer_cast<RalList>(mp)->add(read_form(r));
         return mp;
     }
     else if (repr == "~") {
         DBG << "read_atom: macro:unquote >" << repr;
         RalTypePtr mp = std::make_shared<RalList>('(');
-        std::static_pointer_cast<RalList>(mp)->add(std::make_shared<RalSymbol>("unquote"));
+        std::static_pointer_cast<RalList>(mp)->add(
+            std::make_shared<RalSymbol>("unquote"));
         std::static_pointer_cast<RalList>(mp)->add(read_form(r));
         return mp;
     }
     else if (repr == "~@") {
         DBG << "read_atom: macro:splice-unquote >" << repr;
         RalTypePtr mp = std::make_shared<RalList>('(');
-        std::static_pointer_cast<RalList>(mp)->add(std::make_shared<RalSymbol>("splice-unquote"));
+        std::static_pointer_cast<RalList>(mp)->add(
+            std::make_shared<RalSymbol>("splice-unquote"));
         std::static_pointer_cast<RalList>(mp)->add(read_form(r));
         return mp;
     }
     else if (repr == "@") {
         DBG << "read_atom: macro:deref >" << repr;
         RalTypePtr mp = std::make_shared<RalList>('(');
-        std::static_pointer_cast<RalList>(mp)->add(std::make_shared<RalSymbol>("deref"));
+        std::static_pointer_cast<RalList>(mp)->add(
+            std::make_shared<RalSymbol>("deref"));
         std::static_pointer_cast<RalList>(mp)->add(read_form(r));
         return mp;
     }
-    // expands the token "^" to return a new list that contains the symbol "with-meta" and 
-    // the result of reading the next next form (2nd argument) (read_form) and the next form 
-    // (1st argument) in that order (metadata comes first with the ^ macro and the function second).
+    // expands the token "^" to return a new list that contains the symbol
+    // "with-meta" and the result of reading the next next form (2nd argument)
+    // (read_form) and the next form (1st argument) in that order (metadata
+    // comes first with the ^ macro and the function second).
     else if (repr == "^") {
         DBG << "read_atom: macro:with-meta >" << repr;
         RalTypePtr mp = std::make_shared<RalList>('(');
-        std::static_pointer_cast<RalList>(mp)->add(std::make_shared<RalSymbol>("with-meta"));
+        std::static_pointer_cast<RalList>(mp)->add(
+            std::make_shared<RalSymbol>("with-meta"));
         auto first = read_form(r);
         auto second = read_form(r);
         std::static_pointer_cast<RalList>(mp)->add(second);
@@ -251,7 +260,8 @@ RalTypePtr read_atom(Reader &r)
 
 // ================================================================================
 // tokenize will take a single string and return an array of all the tokens.
-static const std::regex token_regex(R"([\s,]*(~@|[\[\]{}()'`~^@]|\"(?:\\.|[^\\\"])*\"?|;.*|[^\s\[\]{}('\"`,;)]+))");
+static const std::regex token_regex(
+    R"([\s,]*(~@|[\[\]{}()'`~^@]|\"(?:\\.|[^\\\"])*\"?|;.*|[^\s\[\]{}('\"`,;)]+))");
 std::vector<std::string> tokenize(std::string s)
 {
     DBG << "tokenize: >" << s;

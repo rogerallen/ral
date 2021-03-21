@@ -8,6 +8,7 @@ There are many others like it, but this one is mine.
 ```
 X double numbers & math functions
 X PI math constant & TAU, E
+O clean up error handling
 O meta for documentation
 O how to do self-doc?  get list of fns from env
 O ?read hex numbers?
@@ -27,10 +28,9 @@ O ?large integers?
   - RalLambda::eval(), equal()
   - RalAtom::eval(), equal()
 
-
 ## Notes
 
-Seems to work on Windows via Visual Studio 2019, g++ on WSL2 Ubuntu 20.04 and normal Ubuntu 20.04.
+Works on Windows via Visual Studio 2019, WSL2 Ubuntu 20.04 and normal Ubuntu 20.04 via g++.
 
 Tests don't run on Windows because they require python and I don't feel like getting that working.
 

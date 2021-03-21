@@ -1,7 +1,7 @@
 // ======================================================================
 // ral - Roger Allen's Lisp via https://github.com/kanaka/mal
 // Copyright(C) 2020 Roger Allen
-// 
+//
 // env.cpp - environment class
 // this class implents holding the data for an environment and a
 // pointer to the outer environment.
@@ -11,12 +11,12 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 // ======================================================================
@@ -33,28 +33,31 @@ RalEnv::RalEnv()
     // data_ is default initialized
 }
 
-RalEnv::RalEnv(RalEnvPtr outer, std::vector<RalTypePtr> &binds, std::vector<RalTypePtr> &exprs)
+RalEnv::RalEnv(RalEnvPtr outer, std::vector<RalTypePtr> &binds,
+               std::vector<RalTypePtr> &exprs)
 {
     outer_ = outer;
     bool varArgMode = false;
     size_t i = 0;
     for (auto mp : binds) {
-        if(!varArgMode) {
-            if(mp->str(false) == "&") {
+        if (!varArgMode) {
+            if (mp->str(false) == "&") {
                 DBG << "& => varArgMode\n";
                 varArgMode = true;
             }
             else {
-                DBG << "env_bind: " << mp->str(false) << " = " << exprs[i]->str(true) << "\n";
+                DBG << "env_bind: " << mp->str(false) << " = "
+                    << exprs[i]->str(true) << "\n";
                 data_[mp->str(false)] = exprs[i++];
             }
         }
         else {
             RalTypePtr lp = std::make_shared<RalList>('(');
-            while(i < exprs.size()) {
+            while (i < exprs.size()) {
                 std::static_pointer_cast<RalList>(lp)->add(exprs[i++]);
             }
-            DBG << "env_bind: " << mp->str(false) << " = " << lp->str(true) << "\n";
+            DBG << "env_bind: " << mp->str(false) << " = " << lp->str(true)
+                << "\n";
             data_[mp->str(false)] = lp;
         }
     }

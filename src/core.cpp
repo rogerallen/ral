@@ -1,9 +1,9 @@
 // ======================================================================
 // ral - Roger Allen's Lisp via https://github.com/kanaka/mal
 // Copyright(C) 2020 Roger Allen
-// 
+//
 // core.cpp - core functions implemented in C++
-// each function implemnents RalFunctionSignature which 
+// each function implemnents RalFunctionSignature which
 // takes begin & end RalTypeIter and returns RalTypePtr.
 //
 // ======================================================================
@@ -11,12 +11,12 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 // ======================================================================
@@ -24,18 +24,18 @@
 #include "printer.h"
 #include "reader.h"
 #include <chrono>
+#include <cmath>
 #include <cstdint>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <cmath>
 
 // Another windows/Visual Studio compile issue
-#ifdef __linux__ 
+#ifdef __linux__
 #include "linenoise.hpp"
 #else
-namespace linenoise  {
-    bool Readline(const char*, std::string&);
+namespace linenoise {
+bool Readline(const char *, std::string &);
 };
 #endif
 
@@ -108,8 +108,7 @@ const std::map<std::string, RalFunctionSignature> RalCore::ns = {
     {"number?", ral_number_q},
     {"seq", ral_seq},
     {"conj", ral_conj},
-    {"macro?", ral_macro_q}
-};
+    {"macro?", ral_macro_q}};
 
 // ================================================================================
 // CHECKS
@@ -119,7 +118,8 @@ void checkArgsEqual(const char *name, size_t expected, size_t num)
 {
     if (expected != num) {
         std::ostringstream errSS;
-        errSS << "'" << name << "' requires " << expected << " parameters and " << num << " were provided.";
+        errSS << "'" << name << "' requires " << expected << " parameters and "
+              << num << " were provided.";
         throw RalException(errSS.str());
     }
 }
@@ -127,7 +127,8 @@ void checkArgsAtLeast(const char *name, size_t min, size_t num)
 {
     if (num < min) {
         std::ostringstream errSS;
-        errSS << "'" << name << "' requires at least " << min << " parameters and " << num << " were provided.";
+        errSS << "'" << name << "' requires at least " << min
+              << " parameters and " << num << " were provided.";
         throw RalException(errSS.str());
     }
 }
@@ -135,7 +136,8 @@ void checkArgsEven(const char *name, size_t num)
 {
     if (num % 2 != 0) {
         std::ostringstream errSS;
-        errSS << "'" << name << "' requires an even number of parameters and " << num << " were provided.";
+        errSS << "'" << name << "' requires an even number of parameters and "
+              << num << " were provided.";
         throw RalException(errSS.str());
     }
 }
@@ -143,7 +145,8 @@ void checkArgsOdd(const char *name, size_t num)
 {
     if (num % 2 != 1) {
         std::ostringstream errSS;
-        errSS << "'" << name << "' requires an odd number of parameters and " << num << " were provided.";
+        errSS << "'" << name << "' requires an odd number of parameters and "
+              << num << " were provided.";
         throw RalException(errSS.str());
     }
 }
@@ -157,23 +160,23 @@ RalTypePtr ral_add(RalTypeIter begin, RalTypeIter end)
     checkArgsAtLeast("+", 1, std::distance(begin, end));
     RalTypeIter iter = begin;
     arithmetic_type atype = INTEGER;
-    if((*iter)->kind() == RalKind::DOUBLE) {
+    if ((*iter)->kind() == RalKind::DOUBLE) {
         atype = DOUBLE;
     }
     int64_t i_value;
     double d_value;
-    if(atype == DOUBLE) {
+    if (atype == DOUBLE) {
         d_value = (**(iter++)).asDouble();
     }
     else {
         i_value = (**(iter++)).asInt();
     }
     for (; iter != end;) {
-        if((atype == INTEGER) && (*iter)->kind() == RalKind::DOUBLE) {
+        if ((atype == INTEGER) && (*iter)->kind() == RalKind::DOUBLE) {
             atype = DOUBLE;
             d_value = (double)i_value;
         }
-        if(atype == DOUBLE) {
+        if (atype == DOUBLE) {
             d_value += (**(iter++)).asDouble();
         }
         else {
@@ -181,7 +184,7 @@ RalTypePtr ral_add(RalTypeIter begin, RalTypeIter end)
         }
     }
     RalTypePtr mp;
-    if(atype == DOUBLE) {
+    if (atype == DOUBLE) {
         mp = std::make_shared<RalDouble>(d_value);
     }
     else {
@@ -196,23 +199,23 @@ RalTypePtr ral_sub(RalTypeIter begin, RalTypeIter end)
     checkArgsAtLeast("-", 1, std::distance(begin, end));
     RalTypeIter iter = begin;
     arithmetic_type atype = INTEGER;
-    if((*iter)->kind() == RalKind::DOUBLE) {
+    if ((*iter)->kind() == RalKind::DOUBLE) {
         atype = DOUBLE;
     }
     int64_t i_value;
     double d_value;
-    if(atype == DOUBLE) {
+    if (atype == DOUBLE) {
         d_value = (**(iter++)).asDouble();
     }
     else {
         i_value = (**(iter++)).asInt();
     }
     for (; iter != end;) {
-        if((atype == INTEGER) && (*iter)->kind() == RalKind::DOUBLE) {
+        if ((atype == INTEGER) && (*iter)->kind() == RalKind::DOUBLE) {
             atype = DOUBLE;
             d_value = (double)i_value;
         }
-        if(atype == DOUBLE) {
+        if (atype == DOUBLE) {
             d_value -= (**(iter++)).asDouble();
         }
         else {
@@ -220,7 +223,7 @@ RalTypePtr ral_sub(RalTypeIter begin, RalTypeIter end)
         }
     }
     RalTypePtr mp;
-    if(atype == DOUBLE) {
+    if (atype == DOUBLE) {
         mp = std::make_shared<RalDouble>(d_value);
     }
     else {
@@ -235,23 +238,23 @@ RalTypePtr ral_mul(RalTypeIter begin, RalTypeIter end)
     checkArgsAtLeast("*", 1, std::distance(begin, end));
     RalTypeIter iter = begin;
     arithmetic_type atype = INTEGER;
-    if((*iter)->kind() == RalKind::DOUBLE) {
+    if ((*iter)->kind() == RalKind::DOUBLE) {
         atype = DOUBLE;
     }
     int64_t i_value;
     double d_value;
-    if(atype == DOUBLE) {
+    if (atype == DOUBLE) {
         d_value = (**(iter++)).asDouble();
     }
     else {
         i_value = (**(iter++)).asInt();
     }
     for (; iter != end;) {
-        if((atype == INTEGER) && (*iter)->kind() == RalKind::DOUBLE) {
+        if ((atype == INTEGER) && (*iter)->kind() == RalKind::DOUBLE) {
             atype = DOUBLE;
             d_value = (double)i_value;
         }
-        if(atype == DOUBLE) {
+        if (atype == DOUBLE) {
             d_value *= (**(iter++)).asDouble();
         }
         else {
@@ -259,14 +262,13 @@ RalTypePtr ral_mul(RalTypeIter begin, RalTypeIter end)
         }
     }
     RalTypePtr mp;
-    if(atype == DOUBLE) {
+    if (atype == DOUBLE) {
         mp = std::make_shared<RalDouble>(d_value);
     }
     else {
         mp = std::make_shared<RalInteger>(i_value);
     }
     return mp;
-
 }
 
 // ================================================================================
@@ -275,23 +277,23 @@ RalTypePtr ral_div(RalTypeIter begin, RalTypeIter end)
     checkArgsAtLeast("/", 1, std::distance(begin, end));
     RalTypeIter iter = begin;
     arithmetic_type atype = INTEGER;
-    if((*iter)->kind() == RalKind::DOUBLE) {
+    if ((*iter)->kind() == RalKind::DOUBLE) {
         atype = DOUBLE;
     }
     int64_t i_value;
     double d_value;
-    if(atype == DOUBLE) {
+    if (atype == DOUBLE) {
         d_value = (**(iter++)).asDouble();
     }
     else {
         i_value = (**(iter++)).asInt();
     }
     for (; iter != end;) {
-        if((atype == INTEGER) && (*iter)->kind() == RalKind::DOUBLE) {
+        if ((atype == INTEGER) && (*iter)->kind() == RalKind::DOUBLE) {
             atype = DOUBLE;
             d_value = (double)i_value;
         }
-        if(atype == DOUBLE) {
+        if (atype == DOUBLE) {
             d_value /= (**(iter++)).asDouble();
         }
         else {
@@ -299,7 +301,7 @@ RalTypePtr ral_div(RalTypeIter begin, RalTypeIter end)
         }
     }
     RalTypePtr mp;
-    if(atype == DOUBLE) {
+    if (atype == DOUBLE) {
         mp = std::make_shared<RalDouble>(d_value);
     }
     else {
@@ -347,13 +349,13 @@ RalTypePtr ral_abs(RalTypeIter begin, RalTypeIter end)
     checkArgsEqual("abs", 1, std::distance(begin, end));
     RalTypeIter iter = begin;
     arithmetic_type atype = INTEGER;
-    if((*iter)->kind() == RalKind::DOUBLE) {
+    if ((*iter)->kind() == RalKind::DOUBLE) {
         atype = DOUBLE;
     }
     int64_t i_value;
     double d_value;
     RalTypePtr mp;
-    if(atype == DOUBLE) {
+    if (atype == DOUBLE) {
         d_value = (**(iter++)).asDouble();
         d_value = abs(d_value);
         mp = std::make_shared<RalDouble>(d_value);
@@ -380,14 +382,16 @@ RalTypePtr ral_list(RalTypeIter begin, RalTypeIter end)
 RalTypePtr ral_list_q(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsAtLeast("list?", 1, std::distance(begin, end));
-    return (**begin).isList() ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+    return (**begin).isList() ? std::make_shared<RalConstant>("true")
+                              : std::make_shared<RalConstant>("false");
 }
 
 // ================================================================================
 RalTypePtr ral_empty_q(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsAtLeast("empty?", 1, std::distance(begin, end));
-    return (**begin).isEmptyList() ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+    return (**begin).isEmptyList() ? std::make_shared<RalConstant>("true")
+                                   : std::make_shared<RalConstant>("false");
 }
 // ================================================================================
 RalTypePtr ral_count(RalTypeIter begin, RalTypeIter end)
@@ -401,8 +405,9 @@ RalTypePtr ral_count(RalTypeIter begin, RalTypeIter end)
 }
 // ================================================================================
 // =: compare the first two parameters and return true if they are the same type
-// and contain the same value. In the case of equal length lists, each element of
-// the list should be compared for equality and if they are the same return true, otherwise false.
+// and contain the same value. In the case of equal length lists, each element
+// of the list should be compared for equality and if they are the same return
+// true, otherwise false.
 RalTypePtr ral_equal(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsAtLeast("=", 2, std::distance(begin, end));
@@ -425,20 +430,22 @@ RalTypePtr ral_lt(RalTypeIter begin, RalTypeIter end)
     checkArgsEqual("<", 2, std::distance(begin, end));
     RalTypeIter iter = begin;
     arithmetic_type atype = INTEGER;
-    if(((**(iter)).kind() == RalKind::DOUBLE) ||
-       ((**(iter+1)).kind() == RalKind::DOUBLE)) {
+    if (((**(iter)).kind() == RalKind::DOUBLE) ||
+        ((**(iter + 1)).kind() == RalKind::DOUBLE)) {
         atype = DOUBLE;
     }
     RalTypePtr mp;
-    if(atype == DOUBLE) {
+    if (atype == DOUBLE) {
         double a = (*iter++)->asDouble();
         double b = (*iter)->asDouble();
-        mp = (a < b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+        mp = (a < b) ? std::make_shared<RalConstant>("true")
+                     : std::make_shared<RalConstant>("false");
     }
     else {
         int64_t a = (*iter++)->asInt();
         int64_t b = (*iter)->asInt();
-        mp = (a < b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+        mp = (a < b) ? std::make_shared<RalConstant>("true")
+                     : std::make_shared<RalConstant>("false");
     }
     return mp;
 }
@@ -449,20 +456,22 @@ RalTypePtr ral_le(RalTypeIter begin, RalTypeIter end)
     checkArgsEqual("<=", 2, std::distance(begin, end));
     RalTypeIter iter = begin;
     arithmetic_type atype = INTEGER;
-    if(((**(iter)).kind() == RalKind::DOUBLE) ||
-       ((**(iter+1)).kind() == RalKind::DOUBLE)) {
+    if (((**(iter)).kind() == RalKind::DOUBLE) ||
+        ((**(iter + 1)).kind() == RalKind::DOUBLE)) {
         atype = DOUBLE;
     }
     RalTypePtr mp;
-    if(atype == DOUBLE) {
+    if (atype == DOUBLE) {
         double a = (*iter++)->asDouble();
         double b = (*iter)->asDouble();
-        mp = (a <= b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+        mp = (a <= b) ? std::make_shared<RalConstant>("true")
+                      : std::make_shared<RalConstant>("false");
     }
     else {
         int64_t a = (*iter++)->asInt();
         int64_t b = (*iter)->asInt();
-        mp = (a <= b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+        mp = (a <= b) ? std::make_shared<RalConstant>("true")
+                      : std::make_shared<RalConstant>("false");
     }
     return mp;
 }
@@ -473,20 +482,22 @@ RalTypePtr ral_gt(RalTypeIter begin, RalTypeIter end)
     checkArgsEqual(">", 2, std::distance(begin, end));
     RalTypeIter iter = begin;
     arithmetic_type atype = INTEGER;
-    if(((**(iter)).kind() == RalKind::DOUBLE) ||
-       ((**(iter+1)).kind() == RalKind::DOUBLE)) {
+    if (((**(iter)).kind() == RalKind::DOUBLE) ||
+        ((**(iter + 1)).kind() == RalKind::DOUBLE)) {
         atype = DOUBLE;
     }
     RalTypePtr mp;
-    if(atype == DOUBLE) {
+    if (atype == DOUBLE) {
         double a = (*iter++)->asDouble();
         double b = (*iter)->asDouble();
-        mp = (a > b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+        mp = (a > b) ? std::make_shared<RalConstant>("true")
+                     : std::make_shared<RalConstant>("false");
     }
     else {
         int64_t a = (*iter++)->asInt();
         int64_t b = (*iter)->asInt();
-        mp = (a > b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+        mp = (a > b) ? std::make_shared<RalConstant>("true")
+                     : std::make_shared<RalConstant>("false");
     }
     return mp;
 }
@@ -497,27 +508,29 @@ RalTypePtr ral_ge(RalTypeIter begin, RalTypeIter end)
     checkArgsEqual(">=", 2, std::distance(begin, end));
     RalTypeIter iter = begin;
     arithmetic_type atype = INTEGER;
-    if(((**(iter)).kind() == RalKind::DOUBLE) ||
-       ((**(iter+1)).kind() == RalKind::DOUBLE)) {
+    if (((**(iter)).kind() == RalKind::DOUBLE) ||
+        ((**(iter + 1)).kind() == RalKind::DOUBLE)) {
         atype = DOUBLE;
     }
     RalTypePtr mp;
-    if(atype == DOUBLE) {
+    if (atype == DOUBLE) {
         double a = (*iter++)->asDouble();
         double b = (*iter)->asDouble();
-        mp = (a >= b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+        mp = (a >= b) ? std::make_shared<RalConstant>("true")
+                      : std::make_shared<RalConstant>("false");
     }
     else {
         int64_t a = (*iter++)->asInt();
         int64_t b = (*iter)->asInt();
-        mp = (a >= b) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+        mp = (a >= b) ? std::make_shared<RalConstant>("true")
+                      : std::make_shared<RalConstant>("false");
     }
     return mp;
 }
 
 // ================================================================================
-// pr-str: calls pr_str on each argument with print_readably set to true, joins the
-// results with " " and returns the new string.
+// pr-str: calls pr_str on each argument with print_readably set to true, joins
+// the results with " " and returns the new string.
 RalTypePtr ral_pr_str(RalTypeIter begin, RalTypeIter end)
 {
     RalTypeIter iter = begin;
@@ -565,8 +578,9 @@ RalTypePtr ral_prn(RalTypeIter begin, RalTypeIter end)
 }
 
 // ================================================================================
-// println: calls pr_str on each argument with print_readably set to false, joins
-// the results with " ", prints the string to the screen and then returns nil.
+// println: calls pr_str on each argument with print_readably set to false,
+// joins the results with " ", prints the string to the screen and then returns
+// nil.
 RalTypePtr ral_println(RalTypeIter begin, RalTypeIter end)
 {
     RalTypeIter iter = begin;
@@ -592,13 +606,15 @@ RalTypePtr ral_read_string(RalTypeIter begin, RalTypeIter end)
 }
 
 // ================================================================================
-// slurp: this function takes a file name (string) and returns the contents of the file as a string
+// slurp: this function takes a file name (string) and returns the contents of
+// the file as a string
 RalTypePtr ral_slurp(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual("slurp", 1, std::distance(begin, end));
     std::string filename = (*begin)->str(false);
     // https://stackoverflow.com/questions/524591/performance-of-creating-a-c-stdstring-from-an-input-iterator/524843#524843
-    std::ifstream ifs(filename.c_str(), std::ios::in | std::ios::binary | std::ios::ate);
+    std::ifstream ifs(filename.c_str(),
+                      std::ios::in | std::ios::binary | std::ios::ate);
     if (!ifs.is_open()) {
         throw RalException("file not found: " + filename);
     }
@@ -645,9 +661,9 @@ RalTypePtr ral_reset(RalTypeIter begin, RalTypeIter end)
 
 // ================================================================================
 // swap!: Takes an atom, a function, and zero or more function arguments. The
-// atom's value is modified to the result of applying the function with the atom's
-// value as the first argument and the optionally given function arguments as the
-// rest of the arguments. The new atom's value is returned.
+// atom's value is modified to the result of applying the function with the
+// atom's value as the first argument and the optionally given function
+// arguments as the rest of the arguments. The new atom's value is returned.
 RalTypePtr ral_swap(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsAtLeast("swap!", 2, std::distance(begin, end));
@@ -667,8 +683,8 @@ RalTypePtr ral_swap(RalTypeIter begin, RalTypeIter end)
 }
 
 // ================================================================================
-// cons: this function takes a list as its second parameter and returns a new list
-// that has the first argument prepended to it.
+// cons: this function takes a list as its second parameter and returns a new
+// list that has the first argument prepended to it.
 RalTypePtr ral_cons(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual("cons", 2, std::distance(begin, end));
@@ -701,9 +717,9 @@ RalTypePtr ral_concat(RalTypeIter begin, RalTypeIter end)
 }
 
 // ================================================================================
-// nth: this function takes a list (or vector) and a number (index) as arguments,
-// returns the element of the list at the given index. If the index is out of
-// range, this function raises an exception.
+// nth: this function takes a list (or vector) and a number (index) as
+// arguments, returns the element of the list at the given index. If the index
+// is out of range, this function raises an exception.
 RalTypePtr ral_nth(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual("nth", 2, std::distance(begin, end));
@@ -722,7 +738,8 @@ RalTypePtr ral_nth(RalTypeIter begin, RalTypeIter end)
 
 // ================================================================================
 // first: this function takes a list (or vector) as its argument and return the
-// first element. If the list (or vector) is empty or is nil then nil is returned.
+// first element. If the list (or vector) is empty or is nil then nil is
+// returned.
 RalTypePtr ral_first(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual("first", 1, std::distance(begin, end));
@@ -735,8 +752,8 @@ RalTypePtr ral_first(RalTypeIter begin, RalTypeIter end)
 
 // ================================================================================
 // rest: this function takes a list (or vector) as its argument and returns a
-// new list containing all the elements except the first. If the list (or vector)
-// is empty or is nil then () (empty list) is returned.
+// new list containing all the elements except the first. If the list (or
+// vector) is empty or is nil then () (empty list) is returned.
 RalTypePtr ral_rest(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual("rest", 1, std::distance(begin, end));
@@ -753,7 +770,8 @@ RalTypePtr ral_rest(RalTypeIter begin, RalTypeIter end)
 }
 
 // ================================================================================
-// throw: this function takes a ral type/value and throws/raises it as an exception.
+// throw: this function takes a ral type/value and throws/raises it as an
+// exception.
 RalTypePtr ral_throw(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual("throw", 1, std::distance(begin, end));
@@ -768,7 +786,8 @@ RalTypePtr ral_throw(RalTypeIter begin, RalTypeIter end)
 // last argument (if there are any) are concatenated with the final argument to
 // create the arguments that are used to call the function. The apply function
 // allows a function to be called with arguments that are contained in a list
-// (or vector). In other words, (apply F A B [C D]) is equivalent to (F A B C D).
+// (or vector). In other words, (apply F A B [C D]) is equivalent to (F A B C
+// D).
 RalTypePtr ral_apply(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsAtLeast("apply", 2, std::distance(begin, end));
@@ -786,7 +805,8 @@ RalTypePtr ral_apply(RalTypeIter begin, RalTypeIter end)
     }
     // add params in the final list
     auto last = *iter++;
-    for (size_t i = 0; i < std::static_pointer_cast<RalList>(last)->size(); i++) {
+    for (size_t i = 0; i < std::static_pointer_cast<RalList>(last)->size();
+         i++) {
         auto item = std::static_pointer_cast<RalList>(last)->get(i);
         std::static_pointer_cast<RalList>(fn_list)->add(item);
     }
@@ -822,7 +842,8 @@ RalTypePtr ral_nil_q(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual("nil?", 1, std::distance(begin, end));
     bool is_const = (*begin)->kind() == RalKind::CONSTANT;
-    std::string s = (is_const && ((*begin)->str(true) == "nil")) ? "true" : "false";
+    std::string s =
+        (is_const && ((*begin)->str(true) == "nil")) ? "true" : "false";
     return std::make_shared<RalConstant>(s);
 }
 
@@ -832,7 +853,8 @@ RalTypePtr ral_true_q(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual("true?", 1, std::distance(begin, end));
     bool is_const = (*begin)->kind() == RalKind::CONSTANT;
-    std::string s = (is_const && ((*begin)->str(true) == "true")) ? "true" : "false";
+    std::string s =
+        (is_const && ((*begin)->str(true) == "true")) ? "true" : "false";
     return std::make_shared<RalConstant>(s);
 }
 
@@ -842,7 +864,8 @@ RalTypePtr ral_false_q(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual("false?", 1, std::distance(begin, end));
     bool is_const = (*begin)->kind() == RalKind::CONSTANT;
-    std::string s = (is_const && ((*begin)->str(true) == "false")) ? "true" : "false";
+    std::string s =
+        (is_const && ((*begin)->str(true) == "false")) ? "true" : "false";
     return std::make_shared<RalConstant>(s);
 }
 
@@ -865,9 +888,9 @@ RalTypePtr ral_symbol(RalTypeIter begin, RalTypeIter end)
 }
 
 // ================================================================================
-// keyword: takes a string and returns a keyword with the same name (usually just
-// be prepending the special keyword unicode symbol). This function should also
-// detect if the argument is already a keyword and just return it.
+// keyword: takes a string and returns a keyword with the same name (usually
+// just be prepending the special keyword unicode symbol). This function should
+// also detect if the argument is already a keyword and just return it.
 RalTypePtr ral_keyword(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual("keyword", 1, std::distance(begin, end));
@@ -885,7 +908,9 @@ RalTypePtr ral_keyword(RalTypeIter begin, RalTypeIter end)
 RalTypePtr ral_keyword_q(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual("keyword?", 1, std::distance(begin, end));
-    return ((*begin)->kind() == RalKind::KEYWORD) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+    return ((*begin)->kind() == RalKind::KEYWORD)
+               ? std::make_shared<RalConstant>("true")
+               : std::make_shared<RalConstant>("false");
 }
 
 // ================================================================================
@@ -906,7 +931,8 @@ RalTypePtr ral_vector(RalTypeIter begin, RalTypeIter end)
 RalTypePtr ral_vector_q(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual("vector?", 1, std::distance(begin, end));
-    return ((*begin)->isVector()) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+    return ((*begin)->isVector()) ? std::make_shared<RalConstant>("true")
+                                  : std::make_shared<RalConstant>("false");
 }
 
 // ================================================================================
@@ -915,7 +941,9 @@ RalTypePtr ral_vector_q(RalTypeIter begin, RalTypeIter end)
 RalTypePtr ral_sequential_q(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual("sequential?", 1, std::distance(begin, end));
-    return ((*begin)->isList() || (*begin)->isVector()) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+    return ((*begin)->isList() || (*begin)->isVector())
+               ? std::make_shared<RalConstant>("true")
+               : std::make_shared<RalConstant>("false");
 }
 
 // ================================================================================
@@ -937,7 +965,8 @@ RalTypePtr ral_hash_map(RalTypeIter begin, RalTypeIter end)
 }
 
 // ================================================================================
-// map?: takes a single argument and returns true (ral true value) if the argument is a hash-map, otherwise returns false (ral false value).
+// map?: takes a single argument and returns true (ral true value) if the
+// argument is a hash-map, otherwise returns false (ral false value).
 RalTypePtr ral_map_q(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual("map?", 1, std::distance(begin, end));
@@ -948,15 +977,16 @@ RalTypePtr ral_map_q(RalTypeIter begin, RalTypeIter end)
 // ================================================================================
 // assoc: takes a hash-map as the first argument and the remaining arguments are
 // odd/even key/value pairs to "associate" (merge) into the hash-map. Note that
-// the original hash-map is unchanged (remember, ral values are immutable), and a
-// new hash-map containing the old hash-maps key/values plus the merged key/value
-// arguments is returned.
+// the original hash-map is unchanged (remember, ral values are immutable), and
+// a new hash-map containing the old hash-maps key/values plus the merged
+// key/value arguments is returned.
 RalTypePtr ral_assoc(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsAtLeast("assoc", 3, std::distance(begin, end));
     checkArgsOdd("assoc", std::distance(begin, end));
     auto iter = begin;
-    auto mp = std::make_shared<RalMap>(std::static_pointer_cast<RalMap>(*iter++));
+    auto mp =
+        std::make_shared<RalMap>(std::static_pointer_cast<RalMap>(*iter++));
     for (; iter != end; iter++) {
         auto keyp = *iter++;
         auto valuep = *iter;
@@ -975,7 +1005,8 @@ RalTypePtr ral_dissoc(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsAtLeast("dissoc", 2, std::distance(begin, end));
     auto iter = begin;
-    auto mp = std::make_shared<RalMap>(std::static_pointer_cast<RalMap>(*iter++));
+    auto mp =
+        std::make_shared<RalMap>(std::static_pointer_cast<RalMap>(*iter++));
     for (; iter != end; iter++) {
         std::static_pointer_cast<RalMap>(mp)->remove(*iter);
     }
@@ -984,7 +1015,8 @@ RalTypePtr ral_dissoc(RalTypeIter begin, RalTypeIter end)
 
 // ================================================================================
 // get: takes a hash-map and a key and returns the value of looking up that key
-// in the hash-map. If the key is not found in the hash-map then nil is returned.
+// in the hash-map. If the key is not found in the hash-map then nil is
+// returned.
 RalTypePtr ral_get(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual("get", 2, std::distance(begin, end));
@@ -1008,7 +1040,9 @@ RalTypePtr ral_contains_q(RalTypeIter begin, RalTypeIter end)
     auto iter = begin;
     auto hashmap = *iter++;
     auto key = *iter;
-    return std::static_pointer_cast<RalMap>(hashmap)->hasKey(key) ? std::make_shared<RalConstant>("true") : std::make_shared<RalConstant>("false");
+    return std::static_pointer_cast<RalMap>(hashmap)->hasKey(key)
+               ? std::make_shared<RalConstant>("true")
+               : std::make_shared<RalConstant>("false");
 }
 
 // ================================================================================
@@ -1050,8 +1084,10 @@ RalTypePtr ral_readline(RalTypeIter begin, RalTypeIter end)
 //
 RalTypePtr ral_time_ms(RalTypeIter begin, RalTypeIter end)
 {
-    
-    size_t t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+
+    size_t t = std::chrono::duration_cast<std::chrono::milliseconds>(
+                   std::chrono::system_clock::now().time_since_epoch())
+                   .count();
     return std::make_shared<RalInteger>(t);
 }
 
@@ -1063,7 +1099,7 @@ RalTypePtr ral_meta(RalTypeIter begin, RalTypeIter end)
     checkArgsEqual("meta", 1, std::distance(begin, end));
     auto iter = begin;
     auto fn = *iter++;
-    switch(fn->kind()) {
+    switch (fn->kind()) {
     case RalKind::FUNCTION:
     case RalKind::LAMBDA:
     case RalKind::LIST:
@@ -1076,10 +1112,10 @@ RalTypePtr ral_meta(RalTypeIter begin, RalTypeIter end)
 
 // ================================================================================
 // with-meta: this function takes two arguments. The first argument is a ral
-// function and the second argument is another ral value/type to set as metadata.
-// A copy of the ral function is returned that has its meta attribute set to the
-// second argument. Note that it is important that the environment and macro
-// attribute of ral function are retained when it is copied.
+// function and the second argument is another ral value/type to set as
+// metadata. A copy of the ral function is returned that has its meta attribute
+// set to the second argument. Note that it is important that the environment
+// and macro attribute of ral function are retained when it is copied.
 RalTypePtr ral_with_meta(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual("with-meta", 2, std::distance(begin, end));
@@ -1087,13 +1123,15 @@ RalTypePtr ral_with_meta(RalTypeIter begin, RalTypeIter end)
     auto fn = *iter++;
     auto meta = *iter++;
     RalTypePtr mp;
-    switch(fn->kind()) {
+    switch (fn->kind()) {
     case RalKind::FUNCTION:
-        mp = std::make_shared<RalFunction>(std::static_pointer_cast<RalFunction>(fn));
+        mp = std::make_shared<RalFunction>(
+            std::static_pointer_cast<RalFunction>(fn));
         mp->setMeta(meta);
         break;
     case RalKind::LAMBDA:
-        mp = std::make_shared<RalLambda>(std::static_pointer_cast<RalLambda>(fn));
+        mp = std::make_shared<RalLambda>(
+            std::static_pointer_cast<RalLambda>(fn));
         mp->setMeta(meta);
         break;
     case RalKind::LIST:
@@ -1116,10 +1154,11 @@ RalTypePtr ral_fn_q(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual("fn?", 1, std::distance(begin, end));
     bool condition = false;
-    if((*begin)->kind() == RalKind::LAMBDA) {
-        condition = !(std::static_pointer_cast<RalLambda>(*begin)->get_is_macro());
+    if ((*begin)->kind() == RalKind::LAMBDA) {
+        condition =
+            !(std::static_pointer_cast<RalLambda>(*begin)->get_is_macro());
     }
-    else if((*begin)->kind() == RalKind::FUNCTION) {
+    else if ((*begin)->kind() == RalKind::FUNCTION) {
         condition = true;
     }
     std::string s = condition ? "true" : "false";
@@ -1145,21 +1184,21 @@ RalTypePtr ral_number_q(RalTypeIter begin, RalTypeIter end)
 }
 
 // ================================================================================
-// seq: takes a list, vector, string, or nil. If an empty list, empty vector, or 
-// empty string ("") is passed in then nil is returned. Otherwise, a list is 
-// returned unchanged, a vector is converted into a list, and a string is 
-// converted to a list that containing the original string split into single 
+// seq: takes a list, vector, string, or nil. If an empty list, empty vector, or
+// empty string ("") is passed in then nil is returned. Otherwise, a list is
+// returned unchanged, a vector is converted into a list, and a string is
+// converted to a list that containing the original string split into single
 // character strings.
 RalTypePtr ral_seq(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual("seq", 1, std::distance(begin, end));
-    switch((*begin)->kind()) {
+    switch ((*begin)->kind()) {
     case RalKind::LIST: {
         auto ml = std::static_pointer_cast<RalList>(*begin);
-        if(ml->isEmptyList()) {
+        if (ml->isEmptyList()) {
             return std::make_shared<RalConstant>("nil");
         }
-        else if(ml->isVector()) {
+        else if (ml->isVector()) {
             RalTypePtr mp = std::make_shared<RalList>('(');
             for (size_t i = 0; i < ml->size(); i++) {
                 std::static_pointer_cast<RalList>(mp)->add(ml->get(i));
@@ -1174,17 +1213,17 @@ RalTypePtr ral_seq(RalTypeIter begin, RalTypeIter end)
         auto sp = std::static_pointer_cast<RalString>(*begin);
         RalTypePtr mp = std::make_shared<RalList>('(');
         auto str = sp->str(false);
-        if(str.size() == 0) {
-            return std::make_shared<RalConstant>("nil"); 
+        if (str.size() == 0) {
+            return std::make_shared<RalConstant>("nil");
         }
-        for (auto c: str) {
-            auto item = std::make_shared<RalString>(std::string(1,c));
+        for (auto c : str) {
+            auto item = std::make_shared<RalString>(std::string(1, c));
             std::static_pointer_cast<RalList>(mp)->add(item);
         }
         return mp;
     }
     case RalKind::CONSTANT:
-        if((*begin)->str(true) == "nil") {
+        if ((*begin)->str(true) == "nil") {
             return std::make_shared<RalConstant>("nil");
         }
     default:
@@ -1193,25 +1232,26 @@ RalTypePtr ral_seq(RalTypeIter begin, RalTypeIter end)
 }
 
 // ================================================================================
-// conj: takes a collection and one or more elements as arguments and returns 
-// a new collection which includes the original collection and the new elements. 
-// If the collection is a list, a new list is returned with the elements inserted 
-// at the start of the given list in opposite order; if the collection is a vector, 
-// a new vector is returned with the elements added to the end of the given vector.
+// conj: takes a collection and one or more elements as arguments and returns
+// a new collection which includes the original collection and the new elements.
+// If the collection is a list, a new list is returned with the elements
+// inserted at the start of the given list in opposite order; if the collection
+// is a vector, a new vector is returned with the elements added to the end of
+// the given vector.
 RalTypePtr ral_conj(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsAtLeast("seq", 2, std::distance(begin, end));
     auto iter = begin;
     auto first = *iter++;
-    switch(first->kind()) {
+    switch (first->kind()) {
     case RalKind::LIST: {
         auto ml = std::static_pointer_cast<RalList>(first);
-        if(ml->isVector()) {
+        if (ml->isVector()) {
             RalTypePtr mp = std::make_shared<RalList>('[');
             for (size_t i = 0; i < ml->size(); i++) {
                 std::static_pointer_cast<RalList>(mp)->add(ml->get(i));
             }
-            for(; iter != end; iter++) {
+            for (; iter != end; iter++) {
                 std::static_pointer_cast<RalList>(mp)->add(*iter);
             }
             return mp;
@@ -1222,7 +1262,7 @@ RalTypePtr ral_conj(RalTypeIter begin, RalTypeIter end)
             RalTypePtr mp = std::make_shared<RalList>('(');
             iter = end;
             iter--;
-            for(; iter != begin; iter--) {
+            for (; iter != begin; iter--) {
                 std::static_pointer_cast<RalList>(mp)->add(*iter);
             }
             // then add the original list
@@ -1242,7 +1282,10 @@ RalTypePtr ral_conj(RalTypeIter begin, RalTypeIter end)
 RalTypePtr ral_macro_q(RalTypeIter begin, RalTypeIter end)
 {
     checkArgsEqual("macro?", 1, std::distance(begin, end));
-    std::string s = (((*begin)->kind() == RalKind::LAMBDA) && (std::static_pointer_cast<RalLambda>(*begin)->get_is_macro())) ? "true" : "false";
+    std::string s =
+        (((*begin)->kind() == RalKind::LAMBDA) &&
+         (std::static_pointer_cast<RalLambda>(*begin)->get_is_macro()))
+            ? "true"
+            : "false";
     return std::make_shared<RalConstant>(s);
 }
-

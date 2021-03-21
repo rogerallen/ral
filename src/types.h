@@ -1,8 +1,8 @@
 // ======================================================================
 // ral - Roger Allen's Lisp via https://github.com/kanaka/mal
 // Copyright(C) 2020 Roger Allen
-// 
-// types.h - All of the types handled by ral.  
+//
+// types.h - All of the types handled by ral.
 // INTEGER, CONSTANT, SYMBOL, STRING, KEYWORD,
 // LIST, MAP, FUNCTION, LAMBDA, ATOM.
 //
@@ -11,12 +11,12 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 // ======================================================================
@@ -32,8 +32,8 @@
 // ================================================================================
 enum class RalKind {
     NONE,
-    INTEGER, 
-    DOUBLE, 
+    INTEGER,
+    DOUBLE,
     CONSTANT,
     SYMBOL,
     STRING,
@@ -51,26 +51,28 @@ typedef std::shared_ptr<RalType> RalTypePtr;
 typedef std::vector<RalTypePtr>::iterator RalTypeIter;
 class RalType : public std::enable_shared_from_this<RalType> {
   public:
-    virtual ~RalType(){}; // remember to create a virtual destructor if you have virtual methods
+    virtual ~RalType(){}; // remember to create a virtual destructor if you have
+                          // virtual methods
     virtual RalKind kind() = 0;                 // pure virtual
     virtual std::string str(bool readable) = 0; // pure virtual
     virtual RalTypePtr eval(RalEnvPtr env) = 0; // pure virtual
     virtual bool equal(RalTypePtr that) = 0;    // pure virtual
-    // only some types implement the below functions -- they are NOT pure virtual
-    virtual RalTypePtr apply(RalTypeIter begin, RalTypeIter end); 
-    virtual std::string asMapKey();             
+    // only some types implement the below functions -- they are NOT pure
+    // virtual
+    virtual RalTypePtr apply(RalTypeIter begin, RalTypeIter end);
+    virtual std::string asMapKey();
     virtual int64_t asInt();
-    virtual double asDouble();                    
-    virtual bool isNilOrFalse();                
-    virtual RalTypePtr getMeta();               
-    virtual void setMeta(RalTypePtr meta);      
+    virtual double asDouble();
+    virtual bool isNilOrFalse();
+    virtual RalTypePtr getMeta();
+    virtual void setMeta(RalTypePtr meta);
     // methods below only are used in MalList
-    virtual bool isList();                      
-    virtual bool isVector();                    
-    virtual bool isEmptyList();                 
-    virtual RalTypePtr apply();                 
-    virtual void setEnv(RalEnvPtr env);         
-    virtual bool is_macro_call(RalEnvPtr env);  
+    virtual bool isList();
+    virtual bool isVector();
+    virtual bool isEmptyList();
+    virtual RalTypePtr apply();
+    virtual void setEnv(RalEnvPtr env);
+    virtual bool is_macro_call(RalEnvPtr env);
 };
 
 // ================================================================================
@@ -178,7 +180,7 @@ class RalList : public RalType {
     std::vector<RalTypePtr> values_;
     char listStartChar_; // ( for list, [ for vector
     RalTypePtr meta_;
-    
+
     std::string listStartStr();
     std::string listEndStr();
 
@@ -229,7 +231,8 @@ class RalMap : public RalType {
 };
 
 // ================================================================================
-typedef std::function<RalTypePtr(RalTypeIter, RalTypeIter)> RalFunctionSignature;
+typedef std::function<RalTypePtr(RalTypeIter, RalTypeIter)>
+    RalFunctionSignature;
 class RalFunction : public RalType {
     RalFunctionSignature fn_;
     std::string name_;
@@ -317,7 +320,8 @@ class RalUnbalancedBackslash : public std::exception {
 class RalMissingMapValue : public std::exception {
     virtual const char *what() const throw()
     {
-        return "reached the end of input for a map without finding a paired value for a key.";
+        return "reached the end of input for a map without finding a paired "
+               "value for a key.";
     }
 };
 
@@ -351,10 +355,7 @@ class RalNotApplicable : public std::exception {
 
 class RalNotInEnvironment : public std::exception {
     std::string msg_;
-    virtual const char *what() const throw()
-    {
-        return msg_.c_str();
-    }
+    virtual const char *what() const throw() { return msg_.c_str(); }
 
   public:
     RalNotInEnvironment(std::string name)
@@ -391,17 +392,10 @@ class RalIndexOutOfRange : public std::exception {
     }
 };
 
-
 class RalException : public std::exception {
     std::string msg_;
-    virtual const char *what() const throw()
-    {
-        return msg_.c_str();
-    }
+    virtual const char *what() const throw() { return msg_.c_str(); }
 
   public:
-    RalException(std::string msg)
-    {
-        msg_ = msg;
-    }
+    RalException(std::string msg) { msg_ = msg; }
 };

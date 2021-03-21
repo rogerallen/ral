@@ -1,28 +1,28 @@
 // ======================================================================
 // ral - Roger Allen's Lisp via https://github.com/kanaka/mal
 // Copyright(C) 2020 Roger Allen
-// 
+//
 // This program is free software : you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 // ======================================================================
-#include "easylogging++.h"
-#include "logging.h"
-#include "linenoise.hpp"
 #include "core.h"
+#include "easylogging++.h"
 #include "env.h"
-#include "types.h"
+#include "linenoise.hpp"
+#include "logging.h"
 #include "printer.h"
 #include "reader.h"
+#include "types.h"
 #include "version.h"
 #include <iostream>
 #include <string>
@@ -30,7 +30,7 @@
 
 INITIALIZE_EASYLOGGINGPP
 
-bool gInfo  = false;
+bool gInfo = false;
 bool gDebug = false;
 bool gDebug2 = false;
 
@@ -44,8 +44,7 @@ void setup_repl_env(std::vector<std::string> args);
 bool is_pair(RalTypePtr lp);
 RalTypePtr quasiquote(RalTypePtr mp);
 RalTypePtr macroexpand(RalTypePtr ast, RalEnvPtr env);
-void completion(const char* editBuffer, std::vector<std::string>& completions);
-
+void completion(const char *editBuffer, std::vector<std::string> &completions);
 
 // made this a global for ral_eval()
 // FIXME -- maybe there should be a class that has this and
@@ -74,7 +73,7 @@ RalTypePtr EVAL(RalTypePtr mp, RalEnvPtr env)
             DBG << "not list, eval_ast... " << mp->str(true);
             // SYMBOL eval can be a nullptr, so handle it
             auto v = mp->eval(env);
-            if(v == nullptr) {
+            if (v == nullptr) {
                 throw RalNotInEnvironment(mp->str(true));
             }
             return v;
@@ -115,7 +114,8 @@ RalTypePtr EVAL(RalTypePtr mp, RalEnvPtr env)
             auto value = lp->get(2);
             auto e = EVAL(value, env);
             auto lambdap = std::static_pointer_cast<RalLambda>(e);
-            auto copyLambdap = std::make_shared<RalLambda>(new RalLambda(lambdap));
+            auto copyLambdap =
+                std::make_shared<RalLambda>(new RalLambda(lambdap));
             copyLambdap->set_is_macro();
             env->set(symbol, copyLambdap); // update env
             return copyLambdap;
@@ -123,7 +123,7 @@ RalTypePtr EVAL(RalTypePtr mp, RalEnvPtr env)
         // (macroexpand macro)
         else if (first == "macroexpand") {
             DBG << "macroexpand " << lp->str(true);
-            return macroexpand(lp->get(1),env);
+            return macroexpand(lp->get(1), env);
         }
         // (let* (sym1 val1 ...) form) - create new letEnv and EVAL(form,letEnv)
         else if (first == "let*") {
@@ -135,7 +135,7 @@ RalTypePtr EVAL(RalTypePtr mp, RalEnvPtr env)
             // letEnv is temporary
             RalEnvPtr let_env = std::make_shared<RalEnv>(env, binds, exprs);
             letEnvList->setEnv(let_env);
-            //return EVAL(form, let_env);
+            // return EVAL(form, let_env);
             // set ast to the last element and loop for tco
             mp = form;
             env = let_env;
@@ -185,29 +185,29 @@ RalTypePtr EVAL(RalTypePtr mp, RalEnvPtr env)
             return std::make_shared<RalLambda>(bindStrs, form, env);
         }
         // (quote ...)
-        else if(first == "quote") {
+        else if (first == "quote") {
             DBG << "quote " << lp->str(true);
             return lp->get(1);
         }
         // (quasiquote ...)
-        else if(first == "quasiquote") {
+        else if (first == "quasiquote") {
             DBG << "quasiquote " << lp->str(true);
             auto second = lp->get(1);
             mp = quasiquote(second);
         }
         // (try* A (catch* B C))
-        // Add a (native language) try/catch block that evaluates A within the 
-        // try block and catches all exceptions. If an exception is caught, 
-        // then translate it to a ral type/value. For native exceptions this 
-        // is either the message string or a ral hash-map that contains the 
-        // message string and other attributes of the exception. When a regular 
-        // ral type/value is used as an exception, you will probably need to 
-        // store it within a native exception type in order to be able to 
-        // convey/transport it using the native try/catch mechanism. Then you 
-        // will extract the ral type/value from the native exception. Create a 
-        // ral environment that binds B to the value of the exception. 
+        // Add a (native language) try/catch block that evaluates A within the
+        // try block and catches all exceptions. If an exception is caught,
+        // then translate it to a ral type/value. For native exceptions this
+        // is either the message string or a ral hash-map that contains the
+        // message string and other attributes of the exception. When a regular
+        // ral type/value is used as an exception, you will probably need to
+        // store it within a native exception type in order to be able to
+        // convey/transport it using the native try/catch mechanism. Then you
+        // will extract the ral type/value from the native exception. Create a
+        // ral environment that binds B to the value of the exception.
         // Finally, evaluate C using that new environment.
-        else if(first == "try*") {
+        else if (first == "try*") {
             DBG << "try* " << lp->str(true);
             try {
                 auto A = lp->get(1);
@@ -215,7 +215,7 @@ RalTypePtr EVAL(RalTypePtr mp, RalEnvPtr env)
             }
             catch (std::exception &e) {
                 auto ep = std::make_shared<RalString>(e.what());
-                if(lp->size() > 2) {
+                if (lp->size() > 2) {
                     auto catchList = lp->get(2);
                     auto clp = std::static_pointer_cast<RalList>(catchList);
                     auto B = clp->get(1);
@@ -224,10 +224,11 @@ RalTypePtr EVAL(RalTypePtr mp, RalEnvPtr env)
                     binds.push_back(B);
                     std::vector<RalTypePtr> exprs;
                     exprs.push_back(ep);
-                    RalEnvPtr catch_env = std::make_shared<RalEnv>(env, binds, exprs);
+                    RalEnvPtr catch_env =
+                        std::make_shared<RalEnv>(env, binds, exprs);
                     mp = EVAL(C, catch_env);
                 }
-                else{
+                else {
                     mp = ep;
                 }
             }
@@ -246,7 +247,8 @@ RalTypePtr EVAL(RalTypePtr mp, RalEnvPtr env)
                 for (size_t i = 1; i < elp->size(); i++) {
                     rest.push_back(elp->get(i));
                 }
-                env = std::static_pointer_cast<RalLambda>(lambda)->makeEnv(rest.begin(), rest.end());
+                env = std::static_pointer_cast<RalLambda>(lambda)->makeEnv(
+                    rest.begin(), rest.end());
             }
             else {
                 DBG << "non-lambda apply";
@@ -263,9 +265,9 @@ bool is_pair(RalTypePtr mp)
 
 RalTypePtr quasiquote(RalTypePtr mp)
 {
-    // if is_pair of ast is false: return a new list containing: 
+    // if is_pair of ast is false: return a new list containing:
     // a symbol named "quote" and ast.
-    if(!is_pair(mp)) {
+    if (!is_pair(mp)) {
         DBG << "!is_pair";
         auto list = std::make_shared<RalList>('(');
         auto quote = std::make_shared<RalSymbol>("quote");
@@ -276,36 +278,36 @@ RalTypePtr quasiquote(RalTypePtr mp)
     // we know mp is a list
     auto lp = std::static_pointer_cast<RalList>(mp);
     auto first = lp->get(0);
-    // else if the first element of ast is a symbol named "unquote": 
+    // else if the first element of ast is a symbol named "unquote":
     // return the second element of ast.
     if (first->str(true) == "unquote") {
         DBG << "unquote";
         return lp->get(1);
     }
-    // if is_pair of the first element of ast is true and 
-    // the first element of first element of ast (ast[0][0]) is a 
-    // symbol named "splice-unquote": return a new list containing: 
-    // a symbol named "concat", the second element of first element 
-    // of ast (ast[0][1]), and the result of calling quasiquote with 
+    // if is_pair of the first element of ast is true and
+    // the first element of first element of ast (ast[0][0]) is a
+    // symbol named "splice-unquote": return a new list containing:
+    // a symbol named "concat", the second element of first element
+    // of ast (ast[0][1]), and the result of calling quasiquote with
     // the second through last element of ast.
     auto firstlp = std::static_pointer_cast<RalList>(first);
-    if(is_pair(first) && firstlp->get(0)->str(true) == "splice-unquote") {
+    if (is_pair(first) && firstlp->get(0)->str(true) == "splice-unquote") {
         DBG << "splice-unquote";
         auto list = std::make_shared<RalList>('(');
         auto concat = std::make_shared<RalSymbol>("concat");
         list->add(concat);
         list->add(firstlp->get(1));
         auto rest = std::make_shared<RalList>('(');
-        for(size_t i = 1; i < lp->size(); i++) {
+        for (size_t i = 1; i < lp->size(); i++) {
             rest->add(lp->get(i));
         }
         list->add(quasiquote(rest));
         return list;
     }
-    // otherwise: return a new list containing: 
-    // a symbol named "cons", 
-    // the result of calling quasiquote on first element of ast (ast[0]), 
-    // and the result of calling quasiquote with the second through last 
+    // otherwise: return a new list containing:
+    // a symbol named "cons",
+    // the result of calling quasiquote on first element of ast (ast[0]),
+    // and the result of calling quasiquote with the second through last
     // element of ast.
     {
         DBG << "else cons";
@@ -314,7 +316,7 @@ RalTypePtr quasiquote(RalTypePtr mp)
         list->add(cons);
         list->add(quasiquote(first));
         auto rest = std::make_shared<RalList>('(');
-        for(size_t i = 1; i < lp->size(); i++) {
+        for (size_t i = 1; i < lp->size(); i++) {
             rest->add(lp->get(i));
         }
         list->add(quasiquote(rest));
@@ -323,24 +325,24 @@ RalTypePtr quasiquote(RalTypePtr mp)
 }
 
 // ================================================================================
-// This function calls is_macro_call with ast and env and loops 
-// while that condition is true. Inside the loop, the first element 
-// of the ast list (a symbol), is looked up in the environment to 
-// get the macro function. This macro function is then called/applied 
-// with the rest of the ast elements (2nd through the last) as arguments. 
-// The return value of the macro call becomes the new value of ast. 
-// When the loop completes because ast no longer represents a macro 
+// This function calls is_macro_call with ast and env and loops
+// while that condition is true. Inside the loop, the first element
+// of the ast list (a symbol), is looked up in the environment to
+// get the macro function. This macro function is then called/applied
+// with the rest of the ast elements (2nd through the last) as arguments.
+// The return value of the macro call becomes the new value of ast.
+// When the loop completes because ast no longer represents a macro
 // call, the current value of ast is returned.
-RalTypePtr macroexpand(RalTypePtr ast, RalEnvPtr env) 
-{ 
-    while(ast->is_macro_call(env)) {
+RalTypePtr macroexpand(RalTypePtr ast, RalEnvPtr env)
+{
+    while (ast->is_macro_call(env)) {
         DBG << "pre: " << ast->str(true);
         auto listp = std::static_pointer_cast<RalList>(ast);
         auto symbol = std::static_pointer_cast<RalSymbol>(listp->get(0));
         auto func = std::static_pointer_cast<RalLambda>(symbol->eval(env));
         auto funclist = std::make_shared<RalList>('(');
         funclist->add(func);
-        for(size_t i = 1; i < listp->size(); i++) {
+        for (size_t i = 1; i < listp->size(); i++) {
             funclist->add(listp->get(i));
         }
         ast = apply(funclist);
@@ -357,7 +359,8 @@ std::string PRINT(RalTypePtr mp)
 }
 
 // ================================================================================
-RalTypePtr apply(RalTypePtr mp) // FIXME -- reconsider based on mp->lp change in eval
+RalTypePtr
+apply(RalTypePtr mp) // FIXME -- reconsider based on mp->lp change in eval
 {
     INFO << "apply " << mp->str(true);
     // m can only be a RalListType here
@@ -372,7 +375,8 @@ std::string rep(std::string s, RalEnvPtr env)
 }
 
 // ================================================================================
-// FIXME -- move ral_eval into ralCore (eval-with-env form env)?  make eval special form?
+// FIXME -- move ral_eval into ralCore (eval-with-env form env)?  make eval
+// special form?
 RalTypePtr ral_eval(RalTypeIter begin, RalTypeIter end)
 {
     return EVAL(*begin, repl_env);
@@ -399,16 +403,23 @@ void setup_repl_env(std::vector<std::string> args)
     repl_env->set("*build-type*", std::make_shared<RalString>(RAL_BUILD_TYPE));
     // add some functions
     rep("(def! not (fn* (a) (if a false true)))", repl_env);
-    rep("(def! load-file (fn* (f) (eval (read-string (str \"(do \" (slurp f) \"\nnil)\")))))", repl_env);
-    rep("(defmacro! cond (fn* (& xs) (if (> (count xs) 0) (list 'if (first xs) (if (> (count xs) 1) (nth xs 1) (throw \"odd number of forms to cond\")) (cons 'cond (rest (rest xs)))))))", repl_env);
+    rep("(def! load-file (fn* (f) (eval (read-string (str \"(do \" (slurp f) "
+        "\"\nnil)\")))))",
+        repl_env);
+    rep("(defmacro! cond (fn* (& xs) (if (> (count xs) 0) (list 'if (first xs) "
+        "(if (> (count xs) 1) (nth xs 1) (throw \"odd number of forms to "
+        "cond\")) (cons 'cond (rest (rest xs)))))))",
+        repl_env);
     rep("(def! radians (fn* (deg) (* TAU (/ deg 360.))))", repl_env);
     rep("(def! degrees (fn* (rad) (* 360. (/ rad TAU))))", repl_env);
-    rep("(defmacro! defn! (fn* (name args body) `(def! ~name (fn* ~args ~body))))", repl_env);
+    rep("(defmacro! defn! (fn* (name args body) `(def! ~name (fn* ~args "
+        "~body))))",
+        repl_env);
 }
 
 // this needs more work
 // how to find the most-recent interesting first character?
-void completion(const char* editBuffer, std::vector<std::string>& completions) 
+void completion(const char *editBuffer, std::vector<std::string> &completions)
 {
     switch (editBuffer[0]) {
     case 'a':
@@ -455,11 +466,11 @@ int main(int argc, char *argv[])
         std::string arg = argv[i];
         // handle flags without passing them
         if (arg == "-v") {
-            if(!gInfo) {
+            if (!gInfo) {
                 gInfo = true;
             }
             else {
-                if(!gDebug) {
+                if (!gDebug) {
                     gDebug = true;
                 }
                 else {
@@ -471,7 +482,8 @@ int main(int argc, char *argv[])
             args.push_back(arg);
         }
     }
-    //AixLog::Log::init<AixLog::SinkCerr>(AixLog::Severity::trace, AixLog::Type::normal);
+    // AixLog::Log::init<AixLog::SinkCerr>(AixLog::Severity::trace,
+    // AixLog::Type::normal);
     INFO << "Start";
 
     setup_repl_env(args);
@@ -486,7 +498,8 @@ int main(int argc, char *argv[])
     }
     else {
         INFO << "REPL";
-        rep("(println (str \"ral v.\" *version* \" \" *build-type*))", repl_env);
+        rep("(println (str \"ral v.\" *version* \" \" *build-type*))",
+            repl_env);
         const auto path = "history.txt";
         linenoise::SetCompletionCallback(completion);
         linenoise::SetMultiLine(true);
@@ -505,7 +518,7 @@ int main(int argc, char *argv[])
                 prev_input = "";
             }
 #pragma warning(suppress : 4101) // unused var 'e'
-            catch (RalMissingParen& e) {
+            catch (RalMissingParen &e) {
                 prev_input += input + "\n";
             }
             catch (std::exception &e) {

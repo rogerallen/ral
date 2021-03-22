@@ -77,7 +77,7 @@ class RalType : public std::enable_shared_from_this<RalType> {
 
 // ================================================================================
 class RalInteger : public RalType {
-    std::string repr_;
+    const std::string repr_;
     int64_t value_;
 
   public:
@@ -96,7 +96,7 @@ class RalInteger : public RalType {
 
 // ================================================================================
 class RalDouble : public RalType {
-    std::string repr_;
+    const std::string repr_;
     double value_;
 
   public:
@@ -114,7 +114,7 @@ class RalDouble : public RalType {
 
 // ================================================================================
 class RalConstant : public RalType {
-    std::string repr_;
+    const std::string repr_;
 
   public:
     RalConstant(const std::string &s);
@@ -131,7 +131,7 @@ class RalConstant : public RalType {
 
 // ================================================================================
 class RalSymbol : public RalType {
-    std::string repr_;
+    const std::string repr_;
 
   public:
     RalSymbol(const std::string &s);
@@ -146,7 +146,7 @@ class RalSymbol : public RalType {
 std::string transformToPrintable(std::string s);
 
 class RalString : public RalType {
-    std::string repr_;
+    const std::string repr_;
 
   public:
     RalString(const std::string &s);
@@ -161,7 +161,7 @@ class RalString : public RalType {
 
 // ================================================================================
 class RalKeyword : public RalType {
-    std::string repr_;
+    const std::string repr_;
 
   public:
     RalKeyword(const std::string &s);

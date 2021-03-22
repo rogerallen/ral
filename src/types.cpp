@@ -89,23 +89,20 @@ void RalType::setEnv(RalEnvPtr env) { throw RalBadSetEnv(); }
 bool RalType::is_macro_call(RalEnvPtr env) { return false; }
 
 // ================================================================================
-RalInteger::RalInteger(const std::string &s)
+RalInteger::RalInteger(const std::string &s) : repr_(s)
 {
-    repr_ = s;
     value_ = std::stoi(s);
     DBG2 << "***Construct: str " << value_ << " " << this;
 }
 
-RalInteger::RalInteger(int64_t i)
+RalInteger::RalInteger(int64_t i) : repr_(std::to_string(i))
 {
-    repr_ = std::to_string(i);
     value_ = i;
     DBG2 << "***Construct: int " << value_ << " " << this;
 }
 
-RalInteger::RalInteger(RalInteger *that)
+RalInteger::RalInteger(RalInteger *that) : repr_(that->repr_)
 {
-    repr_ = that->repr_;
     value_ = that->value_;
     DBG2 << "***Construct: copy* " << value_ << " " << this;
 }
@@ -135,9 +132,8 @@ int64_t RalInteger::asInt() { return value_; }
 double RalInteger::asDouble() { return (double)value_; }
 
 // ================================================================================
-RalDouble::RalDouble(const std::string &s)
+RalDouble::RalDouble(const std::string &s) : repr_(s)
 {
-    repr_ = s;
     if (repr_ == "PI") {
         value_ = M_PI;
     }
@@ -153,16 +149,14 @@ RalDouble::RalDouble(const std::string &s)
     DBG2 << "***Construct: str " << value_ << " " << this;
 }
 
-RalDouble::RalDouble(double d)
+RalDouble::RalDouble(double d) : repr_(std::to_string(d))
 {
-    repr_ = std::to_string(d);
     value_ = d;
     DBG2 << "***Construct: double " << value_ << " " << this;
 }
 
-RalDouble::RalDouble(RalDouble *that)
+RalDouble::RalDouble(RalDouble *that) : repr_(that->repr_)
 {
-    repr_ = that->repr_;
     value_ = that->value_;
     DBG2 << "***Construct: copy* " << value_ << " " << this;
 }
@@ -190,9 +184,9 @@ bool RalDouble::equal(RalTypePtr that)
 double RalDouble::asDouble() { return value_; }
 
 // ================================================================================
-RalConstant::RalConstant(const std::string &s) { repr_ = s; }
+RalConstant::RalConstant(const std::string &s) : repr_(s) { }
 
-RalConstant::RalConstant(RalConstant *that) { repr_ = that->repr_; }
+RalConstant::RalConstant(RalConstant *that) : repr_(that->repr_) { }
 
 RalConstant::~RalConstant() {}
 
@@ -238,7 +232,7 @@ bool RalConstant::isNilOrFalse()
 }
 
 // ================================================================================
-RalSymbol::RalSymbol(const std::string &s) { repr_ = s; }
+RalSymbol::RalSymbol(const std::string &s) : repr_(s) { }
 
 RalSymbol::~RalSymbol() {}
 
@@ -325,9 +319,9 @@ std::string transformToReadable(const std::string &s)
 }
 
 // ================================================================================
-RalString::RalString(const std::string &s) { repr_ = s; }
+RalString::RalString(const std::string &s) : repr_(s) { }
 
-RalString::RalString(RalString *that) { repr_ = that->repr_; }
+RalString::RalString(RalString *that) : repr_(that->repr_) { }
 
 RalString::~RalString() {}
 
@@ -347,9 +341,9 @@ bool RalString::equal(RalTypePtr that)
 std::string RalString::asMapKey() { return str(false); }
 
 // ================================================================================
-RalKeyword::RalKeyword(const std::string &s) { repr_ = s; }
+RalKeyword::RalKeyword(const std::string &s) : repr_(s) { }
 
-RalKeyword::RalKeyword(RalKeyword *that) { repr_ = that->repr_; }
+RalKeyword::RalKeyword(RalKeyword *that) : repr_(that->repr_) { }
 
 RalKeyword::~RalKeyword() {}
 

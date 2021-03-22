@@ -39,8 +39,8 @@ class RalEnv : public std::enable_shared_from_this<RalEnv> {
     RalEnv();
     RalEnv(RalEnvPtr outer, std::vector<RalTypePtr> &binds,
            std::vector<RalTypePtr> &exprs);
-    void set(std::string name, RalFunctionSignature fn);
-    void set(std::string name, RalTypePtr fn);
-    RalEnvPtr find(std::string name);
-    RalTypePtr get(std::string name);
+    void set(const std::string &name, const RalFunctionSignature &fn);
+    void set(const std::string &name, const RalTypePtr &fn);
+    RalEnvPtr find(const std::string &name);
+    RalTypePtr get(const std::string &name);
 };

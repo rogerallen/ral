@@ -65,20 +65,20 @@ RalEnv::RalEnv(RalEnvPtr outer, std::vector<RalTypePtr> &binds,
 
 // ================================================================================
 // special setter for functions
-void RalEnv::set(std::string name, RalFunctionSignature fn)
+void RalEnv::set(const std::string &name, const RalFunctionSignature &fn)
 {
     set(name, std::make_shared<RalFunction>(name, fn));
 }
 
 // ================================================================================
-void RalEnv::set(std::string name, RalTypePtr mp)
+void RalEnv::set(const std::string &name, const RalTypePtr &mp)
 {
     DBG << "env_set: " << name << " = " << mp->str(true) << "\n";
     data_[name] = mp;
 }
 
 // ================================================================================
-RalEnvPtr RalEnv::find(std::string name)
+RalEnvPtr RalEnv::find(const std::string &name)
 {
     auto it = data_.find(name);
     if (it == data_.end()) {
@@ -97,7 +97,7 @@ RalEnvPtr RalEnv::find(std::string name)
 // NOTE: env::get used to throw exception when it could not find a symbol.
 // now it returns nullptr for a significant speedup.  Callers need to deal
 // with potential for nullptr.
-RalTypePtr RalEnv::get(std::string name)
+RalTypePtr RalEnv::get(const std::string &name)
 {
     // using find() for this is harder than just recursive get
     auto it = data_.find(name);

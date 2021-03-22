@@ -78,7 +78,7 @@ class RalType : public std::enable_shared_from_this<RalType> {
 // ================================================================================
 class RalInteger : public RalType {
     const std::string repr_;
-    int64_t value_;
+    const int64_t value_;
 
   public:
     RalInteger(const std::string &s);
@@ -97,7 +97,7 @@ class RalInteger : public RalType {
 // ================================================================================
 class RalDouble : public RalType {
     const std::string repr_;
-    double value_;
+    const double value_;
 
   public:
     RalDouble(const std::string &s);

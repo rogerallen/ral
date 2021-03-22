@@ -89,31 +89,20 @@ void RalType::setEnv(RalEnvPtr env) { throw RalBadSetEnv(); }
 bool RalType::is_macro_call(RalEnvPtr env) { return false; }
 
 // ================================================================================
-RalInteger::RalInteger(const std::string &s) : repr_(s)
+RalInteger::RalInteger(const std::string &s) : repr_(s), value_(std::stoi(s))
 {
-    value_ = std::stoi(s);
     DBG2 << "***Construct: str " << value_ << " " << this;
 }
 
-RalInteger::RalInteger(int64_t i) : repr_(std::to_string(i))
+RalInteger::RalInteger(int64_t i) : repr_(std::to_string(i)), value_(i)
 {
-    value_ = i;
     DBG2 << "***Construct: int " << value_ << " " << this;
 }
 
-RalInteger::RalInteger(RalInteger *that) : repr_(that->repr_)
+RalInteger::RalInteger(RalInteger *that) : repr_(that->repr_), value_(that->value_)
 {
-    value_ = that->value_;
     DBG2 << "***Construct: copy* " << value_ << " " << this;
 }
-/*
-RalInteger::RalInteger(RalInteger& that)
-{
-    repr_ = that.repr_;
-    value_ = that.value_;
-    DBG2 << "***Construct: copy& " << value_ << " " << this;
-}
-*/
 
 RalInteger::~RalInteger() { DBG2 << "***Destruct: " << value_ << " " << this; }
 
@@ -132,42 +121,33 @@ int64_t RalInteger::asInt() { return value_; }
 double RalInteger::asDouble() { return (double)value_; }
 
 // ================================================================================
-RalDouble::RalDouble(const std::string &s) : repr_(s)
+const double valueHelper(const std::string &s)
 {
-    if (repr_ == "PI") {
-        value_ = M_PI;
+    if (s == "PI") {
+        return(M_PI);
     }
-    else if (repr_ == "TAU") {
-        value_ = M_PI * 2;
+    else if (s == "TAU") {
+        return(M_PI * 2);
     }
-    else if (repr_ == "E") {
-        value_ = M_E;
+    else if (s == "E") {
+        return(M_E);
     }
-    else {
-        value_ = std::stod(s);
-    }
+    return(std::stod(s));
+}
+RalDouble::RalDouble(const std::string &s) : repr_(s), value_(valueHelper(s))
+{
     DBG2 << "***Construct: str " << value_ << " " << this;
 }
 
-RalDouble::RalDouble(double d) : repr_(std::to_string(d))
+RalDouble::RalDouble(double d) : repr_(std::to_string(d)), value_(d)
 {
-    value_ = d;
     DBG2 << "***Construct: double " << value_ << " " << this;
 }
 
-RalDouble::RalDouble(RalDouble *that) : repr_(that->repr_)
+RalDouble::RalDouble(RalDouble *that) : repr_(that->repr_), value_(that->value_)
 {
-    value_ = that->value_;
     DBG2 << "***Construct: copy* " << value_ << " " << this;
 }
-/*
-RalDouble::RalDouble(RalDouble& that)
-{
-    repr_ = that.repr_;
-    value_ = that.value_;
-    DBG2 << "***Construct: copy& " << value_ << " " << this;
-}
-*/
 
 RalDouble::~RalDouble() { DBG2 << "***Destruct: " << value_ << " " << this; }
 
@@ -772,7 +752,7 @@ RalTypePtr RalLambda::getMeta() { return meta_; }
 void RalLambda::setMeta(RalTypePtr meta) { meta_ = meta; }
 
 // ================================================================================
-RalAtom::RalAtom(RalTypePtr that) { value_ = that; }
+RalAtom::RalAtom(RalTypePtr that) : value_(that) { }
 RalAtom::~RalAtom() {}
 std::string RalAtom::str(bool readable)
 {

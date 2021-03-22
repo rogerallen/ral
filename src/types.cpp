@@ -89,7 +89,7 @@ void RalType::setEnv(RalEnvPtr env) { throw RalBadSetEnv(); }
 bool RalType::is_macro_call(RalEnvPtr env) { return false; }
 
 // ================================================================================
-RalInteger::RalInteger(std::string s)
+RalInteger::RalInteger(const std::string &s)
 {
     repr_ = s;
     value_ = std::stoi(s);
@@ -135,7 +135,7 @@ int64_t RalInteger::asInt() { return value_; }
 double RalInteger::asDouble() { return (double)value_; }
 
 // ================================================================================
-RalDouble::RalDouble(std::string s)
+RalDouble::RalDouble(const std::string &s)
 {
     repr_ = s;
     if (repr_ == "PI") {
@@ -190,7 +190,7 @@ bool RalDouble::equal(RalTypePtr that)
 double RalDouble::asDouble() { return value_; }
 
 // ================================================================================
-RalConstant::RalConstant(std::string s) { repr_ = s; }
+RalConstant::RalConstant(const std::string &s) { repr_ = s; }
 
 RalConstant::RalConstant(RalConstant *that) { repr_ = that->repr_; }
 
@@ -238,7 +238,7 @@ bool RalConstant::isNilOrFalse()
 }
 
 // ================================================================================
-RalSymbol::RalSymbol(std::string s) { repr_ = s; }
+RalSymbol::RalSymbol(const std::string &s) { repr_ = s; }
 
 RalSymbol::~RalSymbol() {}
 
@@ -302,7 +302,7 @@ std::string transformToPrintable(std::string s)
     return r;
 }
 
-std::string transformToReadable(std::string s)
+std::string transformToReadable(const std::string &s)
 {
     std::string r;
     for (size_t i = 0; i < s.length(); i++) {
@@ -325,7 +325,7 @@ std::string transformToReadable(std::string s)
 }
 
 // ================================================================================
-RalString::RalString(std::string s) { repr_ = s; }
+RalString::RalString(const std::string &s) { repr_ = s; }
 
 RalString::RalString(RalString *that) { repr_ = that->repr_; }
 
@@ -347,7 +347,7 @@ bool RalString::equal(RalTypePtr that)
 std::string RalString::asMapKey() { return str(false); }
 
 // ================================================================================
-RalKeyword::RalKeyword(std::string s) { repr_ = s; }
+RalKeyword::RalKeyword(const std::string &s) { repr_ = s; }
 
 RalKeyword::RalKeyword(RalKeyword *that) { repr_ = that->repr_; }
 
@@ -688,7 +688,7 @@ RalFunction::RalFunction(std::shared_ptr<RalFunction> that)
     meta_ = that->meta_;
 }
 
-RalFunction::RalFunction(std::string name, RalFunctionSignature fn)
+RalFunction::RalFunction(const std::string &name, RalFunctionSignature fn)
 {
     name_ = "#<function>:" + name;
     fn_ = fn;

@@ -81,7 +81,7 @@ class RalInteger : public RalType {
     int64_t value_;
 
   public:
-    RalInteger(std::string s);
+    RalInteger(const std::string &s);
     RalInteger(int64_t i);
     RalInteger(RalInteger *that);
     /*RalInteger(RalInteger& that);*/
@@ -100,7 +100,7 @@ class RalDouble : public RalType {
     double value_;
 
   public:
-    RalDouble(std::string s);
+    RalDouble(const std::string &s);
     RalDouble(double d);
     RalDouble(RalDouble *that);
     /*RalDouble(RalDouble& that);*/
@@ -117,7 +117,7 @@ class RalConstant : public RalType {
     std::string repr_;
 
   public:
-    RalConstant(std::string s);
+    RalConstant(const std::string &s);
     RalConstant(RalConstant *that);
     ~RalConstant() override;
     RalKind kind() override { return RalKind::CONSTANT; }
@@ -134,7 +134,7 @@ class RalSymbol : public RalType {
     std::string repr_;
 
   public:
-    RalSymbol(std::string s);
+    RalSymbol(const std::string &s);
     ~RalSymbol() override;
     RalKind kind() override { return RalKind::SYMBOL; }
     std::string str(bool readable) override;
@@ -149,7 +149,7 @@ class RalString : public RalType {
     std::string repr_;
 
   public:
-    RalString(std::string s);
+    RalString(const std::string &s);
     RalString(RalString *that);
     ~RalString() override;
     RalKind kind() override { return RalKind::STRING; }
@@ -164,7 +164,7 @@ class RalKeyword : public RalType {
     std::string repr_;
 
   public:
-    RalKeyword(std::string s);
+    RalKeyword(const std::string &s);
     RalKeyword(RalKeyword *that);
     ~RalKeyword() override;
     RalKind kind() override { return RalKind::KEYWORD; }
@@ -241,7 +241,7 @@ class RalFunction : public RalType {
   public:
     RalFunction();
     RalFunction(std::shared_ptr<RalFunction> that);
-    RalFunction(std::string name, RalFunctionSignature fn);
+    RalFunction(const std::string &name, RalFunctionSignature fn);
     ~RalFunction() override;
     RalKind kind() override { return RalKind::FUNCTION; }
     std::string str(bool readable) override;

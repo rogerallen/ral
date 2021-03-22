@@ -84,7 +84,6 @@ class RalInteger : public RalType {
     RalInteger(const std::string &s);
     RalInteger(int64_t i);
     RalInteger(RalInteger *that);
-    /*RalInteger(RalInteger& that);*/
     ~RalInteger() override;
     RalKind kind() override { return RalKind::INTEGER; }
     std::string str(bool readable) override;
@@ -103,7 +102,6 @@ class RalDouble : public RalType {
     RalDouble(const std::string &s);
     RalDouble(double d);
     RalDouble(RalDouble *that);
-    /*RalDouble(RalDouble& that);*/
     ~RalDouble() override;
     RalKind kind() override { return RalKind::DOUBLE; }
     std::string str(bool readable) override;

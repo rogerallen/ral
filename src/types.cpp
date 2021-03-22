@@ -121,7 +121,7 @@ int64_t RalInteger::asInt() { return value_; }
 double RalInteger::asDouble() { return (double)value_; }
 
 // ================================================================================
-const double valueHelper(const std::string &s)
+inline const double valueHelper(const std::string &s)
 {
     if (s == "PI") {
         return(M_PI);
@@ -182,28 +182,12 @@ bool RalConstant::equal(RalTypePtr that)
 
 int64_t RalConstant::asInt()
 {
-    if (repr_ == "nil") {
-        return 0;
-    }
-    else if (repr_ == "true") {
-        return 1;
-    }
-    else { // if(repr_ == "false") {
-        return 0;
-    }
+    return (repr_ == "true") ? 1 : 0;
 }
 
 double RalConstant::asDouble()
 {
-    if (repr_ == "nil") {
-        return 0;
-    }
-    else if (repr_ == "true") {
-        return 1;
-    }
-    else { // if(repr_ == "false") {
-        return 0;
-    }
+    return (repr_ == "true") ? 1.0 : 0.0;
 }
 
 bool RalConstant::isNilOrFalse()

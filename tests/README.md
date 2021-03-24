@@ -6,6 +6,8 @@ Run tests that were used during development.
 
 # Performance
 
+Added memoize.ral and that sure helps fibonacci!  :-)
+
 time python3 perf1.py
 time ../bin/ral perf1.ral
 
@@ -15,9 +17,9 @@ real    0m0.099s
 user    0m0.089s
 sys     0m0.010s
 ral:
-real    0m1.999s
-user    0m1.999s
-sys     0m0.000s
+real    0m0.008s
+user    0m0.007s
+sys     0m0.001s
 
 # using profiler
 

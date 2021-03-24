@@ -1,3 +1,5 @@
+(load-file "memoize.ral")
+
 (def! fib
   (fn* [n]                              ; non-negative number
     (if (<= n 1)
@@ -5,6 +7,8 @@
       (if (= n 2)
         1
         (+ (fib (- n 1)) (fib (- n 2)))))))
+
+(def! fib (memoize fib))
 
 (println "fib 1 =" (fib 1))
 (println "fib 2 =" (fib 2))

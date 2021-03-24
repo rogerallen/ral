@@ -5,7 +5,7 @@ I Made a Lisp based on https://github.com/kanaka/mal
 There are many others like it, but this one is mine.
 
 ## Command line options
-* `-v`: once for info, twice for debug, thrice for even moar debug.  not included in `*ARGV*`
+* `-v`: add once for info, twice for debug, thrice for even moar debug.  not included in `*ARGV*`
 * other arguments prefixed by '-' are added to `*ARGV*`
 * if any arguments remain, the first argument is used as a filename passed to `load-file`.  
 
@@ -20,11 +20,11 @@ The last 50 commands are kept in the  file `history.txt` stored in the current w
 Functions ending in '!' modify state.  `def!`, `defmacro!`, `defn!`, `reset!`, `swap!`
 
 ## Control
-* `(def! symbol value)`: [special] update env with symbol & EVAL(value)
-* `(defmacro! symbol value)`: [special]
-* `(macroexapand macro)`: [special]
-* `(let* (sym1 val1 ...) form)`: [special] create new letEnv and EVAL(form,letEnv)
-* `(do ...)`: [special] evaluate the forms in order
+* `(def! symbol value)`: [special] update env with symbol containing value
+* `(defmacro! symbol value)`: [special] update env with symbol containing value as a macro
+* `(macroexapand macro)`: [special] expand macro
+* `(let* (sym1 val1 ...) form)`: [special] create new environment with symbols & values and return evaluated form
+* `(do ...)`: [special] evaluate the forms in order, returning the value of the last form
 * `(if condition true-form false-form)`: [special] evaluate true-form if the condition evaluates to true, else evaluate the false-form
 * `(fn* binding-list form)`: [special] return a lambda that can be called later.
 * `(quote a)`: [special] return a without evaluating it
@@ -43,106 +43,122 @@ Functions ending in '!' modify state.  `def!`, `defmacro!`, `defn!`, `reset!`, `
 * `(defn! name args body)`: [ral] define function
 
 ## Printing
-* `(pr-str a)`: [core] pr_str
-* `(prn a)`: [core] prn
-* `(println a)`: [core] println
+* `(pr-str ...)`: [core] returns evaluation of args as a string.  
+* `(prn ...)`: [core] evaluate args and print to stdout.  returns nil
+* `(println ...)`: [core] evaluate args and print to stdout, followed by return char.  returns nil
 
 ## System Input
-* `(read-string)`: [core] read_string
-* `(slurp a)`: [core] read in file a
-* `(readline a b)`: [core] readline
-* `(time-ms a b)`: [core] time_ms
 * `(load-file a)`: [ral] read in and evaluate file named a
+* `(readline a)`: [core] prints a as prompt and returns string from user input
+* `(slurp a)`: [core] read in file named a and returns it as a string
+* `(time-ms)`: [core] return system time in ms
 
 ## Math
 
 ### Unary Operations
-* `(- a)`: [core] negate
-* `(sqrt a)`: [core] square root of a
-* `(sin a)`: [core] sine of a in radians
-* `(cos a)`: [core] cosine of a in radians
 * `(abs a)`: [core] absolute value
+* `(cos a)`: [core] cosine of a in radians
+* `(degrees rad)`: [ral] converts rad to degrees
 * `(not a)`: [ral] if a evaluates to true return false, else return true
 * `(radians deg)`: [ral] converts deg to radians
-* `(degrees rad)`: [ral] converts rad to degrees
+* `(sin a)`: [core] sine of a in radians
+* `(sqrt a)`: [core] square root of a
 
 ### Operations
-* `(+ a ...)`: [core] add items
-* `(- a ...)`: [core] subtract items
-* `(* a ...)`: [core] multiply items
-* `(/ a ...)`: [core] divide items
+* `(+ ...)`: [core] add items
+* `(- ...)`: [core] subtract items [NOTE: not unary negate]
+* `(* ...)`: [core] multiply items
+* `(/ ...)`: [core] divide items
 
 ### Unary Conditionals
-* `(list? a)`: [core] is a list
-* `(empty? a)`: [core] is an empty list
-* `(atom? a)`: [core] is an atom
-* `(nil? a)`: [core] nil_q
-* `(true? a)`: [core] true_q
-* `(false? a)`: [core] false_q
-* `(symbol? a)`: [core] symbol_q
-* `(keyword? a)`: [core] keyword_q
-* `(vector? a)`: [core] vector_q
-* `(sequential? a)`: [core] sequential_q
-* `(map? a)`: [core] map_q
-* `(fn? a)`: [core] fn_q
-* `(string? a)`: [core] string_q
-* `(number? a)`: [core] number_q
-* `(macro? a)`: [core] macro_q
-* `(contains? a)`: [core] contains_q
+* `(atom? a)`: [core] return true if a is an atom
+* `(empty? a)`: [core] return true if a is a empty list or empty vector
+* `(false? a)`: [core] return true if a is false
+* `(fn? a)`: [core] return true if a is a function
+* `(keyword? a)`: [core] return true if a is a keyword
+* `(list? a)`: [core] return true if a is a list (not a vector)
+* `(macro? a)`: [core] return true if a is a macro
+* `(map? a)`: [core] return true if a is a hash-map
+* `(nil? a)`: [core] return true if a is nil
+* `(number? a)`: [core] return true if a is a number
+* `(sequential? a)`: [core] return true if a is a list or vector
+* `(string? a)`: [core] return true if a is a string
+* `(symbol? a)`: [core] return true if a is a symbol
+* `(true? a)`: [core] return true if a is true
+* `(vector? a)`: [core] return true if a is a vector
 
 ### Binary Conditionals
-* `(= a b)`: [core] equal
-* `(< a b)`: [core] lt
-* `(<= a b)`: [core] le
-* `(> a b)`: [core] gt
-* `(>= a b)`: [core] ge
+* `(= a b)`: [core] returns true if a and b evaluate to equal values
+* `(< a b)`: [core] ditto less than
+* `(<= a b)`: [core] ditto less than or equal to
+* `(> a b)`: [core] ditto greater than
+* `(>= a b)`: [core] ditto greather than or equal to
 
 ## Data Structures
 
+* `(read-string a)`: [core] parses a and returns the value as a proper ral data structure type
+
 ### Operations on Sequences
-* `(count a)`: [core] count
-* `(concat a b)`: [core] concat
-* `(nth a b)`: [core] nth
-* `(first a b)`: [core] first
-* `(rest a b)`: [core] rest
-* `(map a b)`: [core] map
-* `(seq a b)`: [core] seq
-* `(conj a b)`: [core] conj
+* `(concat ...)`: [core] concatenate items, returning a new list.  All items must be sequences.
+* `(conj a ...)`: [core] add items to a returning the same sequence type.  If a is a list, items are prepended, if a vector items are appended.
+  user> (conj '(:a :b) :c :d)
+  (:d :c :a :b)
+  user> (conj [:a :b] :c :d)
+  [:a :b :c :d]
+* `(cons a seq)`: [core] prepend a onto sequence seq.  returns list.
+* `(count a)`: [core] return count of items in sequence a
+* `(first a)`: [core] return first item in sequence a
+* `(map fn seq)`: [core] map function fn onto each item in sequence seq, returning list
+* `(nth seq n)`: [core] return item n from sequence seq
+* `(rest a)`: [core] return item list after the first in sequence a 
+* `(seq a)`: [core] takes a list, vector, string, or nil. If an empty list, empty vector, or empty string ("") is passed in then nil is returned. Otherwise, a list is returned unchanged, a vector is converted into a list, and a string is converted to a list that containing the original string split into single character strings.
 
 ### Lists
-* `(list a ...)`: [core] list
-* `(cons a b)`: [core] cons
+* `(list ...)`: [core] creates list of items
 
 ### Strings 
-* `(str a)`: [core] str
+* `(str ...)`: [core] creates string from items
 
 ### Atoms
-* `(atom a b)`: [core] atom
-* `(deref a b)`: [core] deref
-* `(reset! a b)`: [core] reset
-* `(swap! a b)`: [core] swap
+* `(atom a)`: [core] create and return atom with value of a
+* `(deref atm)`: [core] deref atom a, returning value
+* `(reset! atm b)`: [core] change the value of atom atm to b
+* `(swap! atm fn [args ...])`: [core] The atom's value is modified to the result of applying the function with the atom's value as the first argument and the optionally given function arguments as the rest of the arguments. The new atom's value is returned.
 
-### Maps
-* `(hash-map a b)`: [core] hash_map
-* `(assoc a b)`: [core] assoc
-* `(dissoc a b)`: [core] dissoc
-* `(get a b)`: [core] get
-* `(keys a b)`: [core] keys
-* `(vals a b)`: [core] vals
+### Hash Maps
+* `{:key1 val1 :key2 val2}`: reader macro for hash-map
+* `(hash-map a b ...)`: [core] returns hash-map using pairs of key & values
+* `(contains? a b)`: [core] return true if hash-map a contains b
+* `(assoc a b c)`: [core] return hash-map a with new key b and value c
+* `(dissoc a b)`: [core] return hash-map a without key b
+* `(get a b)`: [core] get value of key b from hash-map a
+* `(keys a)`: [core] returns keys of hash-map a
+* `(vals a)`: [core] returns values of hash-map a
 
 ### Symbols
-* `(symbol a b)`: [core] symbol
+* `(symbol a)`: [core] returns symbol named a
+  user> (symbol 'abc)
+  abc
 
 ### Keywords
-* `(keyword a b)`: [core] keyword
+* `:a`: reader macro for symbol
+* `(keyword a)`: [core] returns keyword named a
+  user> (keyword 'abc)
+  :abc
 
 ### Vectors
-* `(vector a b)`: [core] vector
+* `[a b c]`: reader macro fro vector
+* `(vector ...)`: [core] returns vector of arguments
+  user> (vector 1 2 3)
+  [1 2 3]
 
 ## Exceptions
-* `(throw a b)`: [core] throw
-* `(apply a b)`: [core] apply
+* `(throw a b)`: [core] throw exception a
+
+## Apply
+* `(apply fn arg1 [arg2 ...])`: [core] takes at least two arguments. The first argument is a function and the last argument is list (or vector). The arguments between the function and the last argument (if there are any) are concatenated with the final argument to create the arguments that are used to call the function. The apply function allows a function to be called with arguments that are contained in a list (or vector). In other words, (apply F A B [C D]) is equivalent to (F A B C D).
 
 ## Meta
 * `(meta a b)`: [core] meta
+* `^a`: reader macro for with-meta
 * `(with-meta a b)`: [core] with_meta

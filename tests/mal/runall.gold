@@ -2,7 +2,7 @@
 step2_eval
 ============================================================
 Started with:
-ral v.0.1 Debug
+ral v.0.2 Release
 
 Testing evaluation of arithmetic operations
 TEST: '(+ 1 2)' -> ['',3] -> SUCCESS
@@ -35,7 +35,7 @@ TEST RESULTS (for ./step2_eval.mal):
 step3_env
 ============================================================
 Started with:
-ral v.0.1 Debug
+ral v.0.2 Release
 
 Testing REPL_ENV
 TEST: '(+ 1 2)' -> ['',3] -> SUCCESS
@@ -89,7 +89,7 @@ TEST RESULTS (for ./step3_env.mal):
 step4_if_fn_do
 ============================================================
 Started with:
-ral v.0.1 Debug
+ral v.0.2 Release
 
 -----------------------------------------------------
 Testing list functions
@@ -310,7 +310,7 @@ TEST RESULTS (for ./step4_if_fn_do.mal):
 step5_tco
 ============================================================
 Started with:
-ral v.0.1 Debug
+ral v.0.2 Release
 
 Testing recursive tail-call function
 TEST: '(def! sum2 (fn* (n acc) (if (= n 0) acc (sum2 (- n 1) (+ n acc)))))' -> ['',] -> SUCCESS (result ignored)
@@ -334,7 +334,7 @@ TEST RESULTS (for ./step5_tco.mal):
 step6_file
 ============================================================
 Started with:
-ral v.0.1 Debug
+ral v.0.2 Release
 
 
 Testing that (do (do)) not broken by TCO
@@ -436,7 +436,7 @@ TEST RESULTS (for ./step6_file.mal):
 step7_quote
 ============================================================
 Started with:
-ral v.0.1 Debug
+ral v.0.2 Release
 
 Testing cons function
 TEST: '(cons 1 (list))' -> ['',(1)] -> SUCCESS
@@ -536,7 +536,7 @@ TEST RESULTS (for ./step7_quote.mal):
 step8_macros
 ============================================================
 Started with:
-ral v.0.1 Debug
+ral v.0.2 Release
 
 Testing trivial macros
 TEST: '(defmacro! one (fn* () 1))' -> ['',] -> SUCCESS (result ignored)
@@ -622,7 +622,7 @@ TEST RESULTS (for ./step8_macros.mal):
 step9_try
 ============================================================
 Started with:
-ral v.0.1 Debug
+ral v.0.2 Release
 
 
 Testing throw
@@ -814,7 +814,7 @@ TEST RESULTS (for ./step9_try.mal):
 stepA_mal
 ============================================================
 Started with:
-ral v.0.1 Debug
+ral v.0.2 Release
 
 
 Testing readline
@@ -973,7 +973,7 @@ TEST RESULTS (for ./stepA_mal.mal):
 ral_double
 ============================================================
 Started with:
-ral v.0.1 Debug
+ral v.0.2 Release
 
 Testing evaluation of double-precision arithmetic operations
 TEST: '(+ 1 2)' -> ['',3] -> SUCCESS
@@ -1005,4 +1005,19 @@ TEST RESULTS (for ./ral_double.mal):
     0: failing tests
    19: passing tests
    19: total tests
+
+============================================================
+ral_bugs
+============================================================
+Started with:
+ral v.0.2 Release
+
+ISSUE #3
+TEST: '(concat :a :b)' -> ['',ERROR: meta not implemented for this type] -> SUCCESS
+
+TEST RESULTS (for ./ral_bugs.mal):
+    0: soft failing tests
+    0: failing tests
+    1: passing tests
+    1: total tests
 

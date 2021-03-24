@@ -707,10 +707,17 @@ RalTypePtr ral_concat(RalTypeIter begin, RalTypeIter end)
 {
     auto list = std::make_shared<RalList>('(');
     for (auto iter = begin; iter != end; iter++) {
-        auto listparam = std::static_pointer_cast<RalList>(*iter);
-        for (size_t i = 0; i < listparam->size(); i++) {
-            auto item = listparam->get(i);
-            std::static_pointer_cast<RalList>(list)->add(item);
+        switch ((*iter)->kind()) {
+        case RalKind::LIST: {
+            auto listparam = std::static_pointer_cast<RalList>(*iter);
+            for (size_t i = 0; i < listparam->size(); i++) {
+                auto item = listparam->get(i);
+                std::static_pointer_cast<RalList>(list)->add(item);
+            }
+            break;
+        }
+        default:
+            throw RalException("meta not implemented for this type");
         }
     }
     return list;

@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.14)
 
 project("ral" 
-        VERSION 0.1
+        VERSION 0.2
         DESCRIPTION "Roger Allen's Lisp"
         LANGUAGES CXX)
 

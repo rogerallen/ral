@@ -25,6 +25,7 @@
 #include "logging.h"
 
 extern bool gDebug;
+extern bool gDebug2;
 
 // ================================================================================
 RalEnv::RalEnv()
@@ -99,6 +100,7 @@ RalEnvPtr RalEnv::find(const std::string &name)
 // with potential for nullptr.
 RalTypePtr RalEnv::get(const std::string &name)
 {
+    DBG2 << "env_get: " << name << "\n";
     // using find() for this is harder than just recursive get
     auto it = data_.find(name);
     if (it == data_.end()) {
@@ -114,5 +116,6 @@ RalTypePtr RalEnv::get(const std::string &name)
 #endif
         }
     }
+    DBG2 << "env_get: " << name << " = " << it->second->str(true) << "\n";
     return (*it).second;
 }

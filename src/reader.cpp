@@ -150,7 +150,7 @@ RalTypePtr read_list(Reader &r, char listStartChar)
 // - constants: nil, true, false
 // - string
 // - keyword
-// - numbers (float or double) TODO (I want to do this)
+// - numbers (both integer and double)
 // It also handles reader-macro expansion.
 static const std::regex integer_regex(R"([+-]\d+|\d+)"); // TODO hex
 static const std::regex double_regex(R"([+-]\d+.|[+-]\d+.\d+|\d+.|\d+.\d+)");

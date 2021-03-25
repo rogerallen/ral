@@ -1,4 +1,4 @@
-(load-file "memoize.ral")
+;;(load-file "memoize.ral")
 
 (def! fib
   (fn* [n]                              ; non-negative number
@@ -9,6 +9,9 @@
         (+ (fib (- n 1)) (fib (- n 2)))))))
 
 (def! fib (memoize fib))
+
+;;(println "time fib 20:" (time (fib 20)))
+;;(println "time fib 25:" (time (fib 25)))
 
 (println "fib 1 =" (fib 1))
 (println "fib 2 =" (fib 2))

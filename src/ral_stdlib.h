@@ -18,22 +18,55 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 // ======================================================================
+//
+// LICENSE NOTE:
+// 
+// Much of this code was originally released under the MPL 2.0 License
+// https://github.com/kanaka/mal/blob/master/LICENSE
+//
+// I am not a lawyer & I don't know if relicensing as GPL violates that
+// license.  If that is not possible, then please consider the code
+// below as MPL 2.0 Licensed.
+//
 #pragma once
 
+// NOTE: 
+//
+// I don't know how to get the static size of this array other than by
+// manually counting each form.  So, be diligent about the "FORM n"
+// comments.
+//
+// Also, be careful about ";; comments inside the form strings.  Be 
+// certain to use \n to end those lines.
+
 const char *RAL_STDLIB_FORMS[] = {
+    
+    // Moved from the repl initialization part of ral.cpp
+
     "(def! not (fn* (a) (if a false true)))", // FORM 1
 
-    "(def! load-file (fn* (f) (eval (read-string (str \"(do \" (slurp f) \"\nnil)\")))))", // FORM 2
+    "(def! load-file"
+    "  (fn* (f)"
+    "    (eval"
+    "      (read-string"
+    "        (str \"(do \" (slurp f) \"\nnil)\")))))", // FORM 2
     
-    "(defmacro! cond (fn* (& xs) (if (> (count xs) 0) (list 'if (first xs) "
-    "(if (> (count xs) 1) (nth xs 1) (throw \"odd number of forms to "
-    "cond\")) (cons 'cond (rest (rest xs)))))))", // FORM 3
+    "(defmacro! cond" 
+    "  (fn* (& xs)"
+    "    (if (> (count xs) 0)"
+    "      (list 'if (first xs)"
+    "        (if (> (count xs) 1)"
+    "          (nth xs 1)"
+    "          (throw \"odd number of forms to cond\"))" 
+    "        (cons 'cond (rest (rest xs)))))))", // FORM 3
     
     "(def! radians (fn* (deg) (* TAU (/ deg 360.))))", // FORM 4
 
     "(def! degrees (fn* (rad) (* 360. (/ rad TAU))))", // FORM 5
     
-    "(defmacro! defn! (fn* (name args body) `(def! ~name (fn* ~args ~body))))", // FORM 6
+    "(defmacro! defn!"
+    "  (fn* (name args body)"
+    "    `(def! ~name (fn* ~args ~body))))", // FORM 6
 
     // ================================================================================
     // Ral "Standard" Library 
@@ -78,17 +111,17 @@ const char *RAL_STDLIB_FORMS[] = {
 
     // Adapted from http://clojure.org/atoms
 
-"(def! memoize"
-"  (fn* [f]"
-"    (let* [mem (atom {})]"
-"      (fn* [& args]"
-"        (let* [key (str args)]"
-"          (if (contains? @mem key)"
-"            (get @mem key)"
-"            (let* [ret (apply f args)]"
-"              (do"
-"                (swap! mem assoc key ret)"
-"                ret))))))))", // FORM 9
+    "(def! memoize"
+    "  (fn* [f]"
+    "    (let* [mem (atom {})]"
+    "      (fn* [& args]"
+    "        (let* [key (str args)]"
+    "          (if (contains? @mem key)"
+    "            (get @mem key)"
+    "            (let* [ret (apply f args)]"
+    "              (do"
+    "                (swap! mem assoc key ret)"
+    "                ret))))))))", // FORM 9
 
     // --------------------------------------------------------------------------------
     // trivial.mal

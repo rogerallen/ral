@@ -40,8 +40,8 @@ Functions ending in '!' modify state.  `def!`, `defmacro!`, `defn!`, `reset!`, `
     else 
       xxx cons
 * `(try* a (catch * b c))`: [special] a (native language) try/catch block
-* `(cond ...)`: [ral] conditional execution
-* `(defn! name args body)`: [ral] define function
+* `(cond ...)`: [stdlib] conditional execution
+* `(defn! name args body)`: [stdlib] define function
 
 ## Printing
 * `(pr-str ...)`: [core] returns evaluation of args as a string.  
@@ -49,7 +49,7 @@ Functions ending in '!' modify state.  `def!`, `defmacro!`, `defn!`, `reset!`, `
 * `(println ...)`: [core] evaluate args and print to stdout, followed by return char.  returns nil
 
 ## System Input
-* `(load-file a)`: [ral] read in and evaluate file named a
+* `(load-file a)`: [stdlib] read in and evaluate file named a
 * `(readline a)`: [core] prints a as prompt and returns string from user input
 * `(slurp a)`: [core] read in file named a and returns it as a string
 * `(time-ms)`: [core] return system time in ms
@@ -59,9 +59,9 @@ Functions ending in '!' modify state.  `def!`, `defmacro!`, `defn!`, `reset!`, `
 ### Unary Operations
 * `(abs a)`: [core] absolute value
 * `(cos a)`: [core] cosine of a in radians
-* `(degrees rad)`: [ral] converts rad to degrees
-* `(not a)`: [ral] if a evaluates to true return false, else return true
-* `(radians deg)`: [ral] converts deg to radians
+* `(degrees rad)`: [stdlib] converts rad to degrees
+* `(not a)`: [stdlib] if a evaluates to true return false, else return true
+* `(radians deg)`: [stdlib] converts deg to radians
 * `(sin a)`: [core] sine of a in radians
 * `(sqrt a)`: [core] square root of a
 
@@ -166,21 +166,21 @@ Functions ending in '!' modify state.  `def!`, `defmacro!`, `defn!`, `reset!`, `
 
 ## Standard Library
 * `(partial fn args ...)`: [stdlib]
-* `(load-file-once a)`: [stdlib]:
-* `(memoize a)`: [stdlib]
-* `(inc a)`: [stdlib]
-* `(dec a)`: [stdlib]
-* `(zero? a)`: [stdlib]
-* `(identity a)`: [stdlib]
-* `(gensym a)`: [stdlib]
-* `(time a)`: [stdlib]
-* `(fun-fn-for a)`: [stdlib]
-* `(pprint a)`: [stdlib]
-* `(reduce f init xs)`: [stdlib]
-* `(foldr f xs acc index)`: [stdlib]
-* `(or a ...)`: [stdlib]
-* `(every? pred xs)`: [stdlib]
-* `(some pred xs)`: [stdlib]
-* `(and a ...)`: [stdlib]
-* `(-> x xs)`: [stdlib]
-* `(->> x xs)`: [stdlib]
+* `(load-file-once path)`: [stdlib] Like load-file, but will never load the same path twice.
+* `(memoize fn)`: [stdlib] Memoize function fn
+* `(inc a)`: [stdlib] integer successor to a
+* `(dec a)`: [stdlib] integer predecessor to a
+* `(zero? a)`: [stdlib] integer null test
+* `(identity a)`: [stdlib] return argument unchanged
+* `(gensym a)`: [stdlib] Generate a hopefully unique symbol. 
+* `(time a)`: [stdlib] Evaluate an expression, and report the time spent
+* `(fun-fn-for fn max-secs)`: [stdlib] Count evaluations of a function during a given time frame.
+* `(pprint a)`: [stdlib] pretty print a ral object
+* `(reduce f init xs)`: [stdlib] left fold of (f (f (f init x1) x2) x3)
+* `(foldr f xs acc index)`: [stdlib] right fold of (f x1 (f x2 (f x3 init)))
+* `(and a ...)`: [stdlib] Search for first evaluation returning `nil` or `false`.  Without arguments, returns `true`.
+* `(or a ...)`: [stdlib] Search for first evaluation returning `true`.  Without arguments, returns `nil`.
+* `(every? pred xs)`: [stdlib] Conjunction of predicate values (pred x1) and .. and (pred xn).  Evaluate `pred x` for each `x` in turn. Return `false` if a result is `nil` or `false`, without evaluating the predicate for the remaining elements.  If all test pass, return `true`.
+* `(some pred xs)`: [stdlib] Disjunction of predicate values (pred x1) or .. (pred xn). Evaluate `(pred x)` for each `x` in turn. Return the first result that is neither `nil` nor `false`, without evaluating the predicate for the remaining elements.  If all tests fail, return `nil`.
+* `(-> x xs)`: [stdlib] Rewrite `x (a a1 a2) .. (b b1 b2)` as `(b (.. (a x a1 a2) ..) b1 b2)`. If anything else than a list is found were `(a a1 a2)` is expected, replace it with a list with one element, so that `-> x a` is equivalent to `-> x (list a)`.
+* `(->> x xs)`: [stdlib] Like `->`, but the arguments describe functions that are partially  applied with *left* arguments.  The previous result is inserted at the *end* of the new argument list. Rewrite `x ((a a1 a2) .. (b b1 b2))` as `(b b1 b2 (.. (a a1 a2 x) ..))`.

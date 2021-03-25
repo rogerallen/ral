@@ -14,6 +14,7 @@ There are many others like it, but this one is mine.
 * `*host-language*`: Ral returns "C++"
 * `*version*`: current version
 * `*build-type*`: Debug or Release
+* `(eval form)`: [core] evaluate form and update the environment
 
 The last 50 commands are kept in the  file `history.txt` stored in the current working directory.
 
@@ -162,3 +163,24 @@ Functions ending in '!' modify state.  `def!`, `defmacro!`, `defn!`, `reset!`, `
 * `(meta a b)`: [core] meta
 * `^a`: reader macro for with-meta
 * `(with-meta a b)`: [core] with_meta
+
+## Standard Library
+* `(partial fn args ...)`: [stdlib]
+* `(load-file-once a)`: [stdlib]:
+* `(memoize a)`: [stdlib]
+* `(inc a)`: [stdlib]
+* `(dec a)`: [stdlib]
+* `(zero? a)`: [stdlib]
+* `(identity a)`: [stdlib]
+* `(gensym a)`: [stdlib]
+* `(time a)`: [stdlib]
+* `(fun-fn-for a)`: [stdlib]
+* `(pprint a)`: [stdlib]
+* `(reduce f init xs)`: [stdlib]
+* `(foldr f xs acc index)`: [stdlib]
+* `(or a ...)`: [stdlib]
+* `(every? pred xs)`: [stdlib]
+* `(some pred xs)`: [stdlib]
+* `(and a ...)`: [stdlib]
+* `(-> x xs)`: [stdlib]
+* `(->> x xs)`: [stdlib]

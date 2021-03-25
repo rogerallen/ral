@@ -21,6 +21,7 @@
 #include "linenoise.hpp"
 #include "logging.h"
 #include "printer.h"
+#include "ral_stdlib.h"
 #include "reader.h"
 #include "types.h"
 #include "version.h"
@@ -401,20 +402,11 @@ void setup_repl_env(std::vector<std::string> args)
     repl_env->set("*host-language*", std::make_shared<RalString>("C++"));
     repl_env->set("*version*", std::make_shared<RalString>(RAL_VERSION));
     repl_env->set("*build-type*", std::make_shared<RalString>(RAL_BUILD_TYPE));
-    // add some functions
-    rep("(def! not (fn* (a) (if a false true)))", repl_env);
-    rep("(def! load-file (fn* (f) (eval (read-string (str \"(do \" (slurp f) "
-        "\"\nnil)\")))))",
-        repl_env);
-    rep("(defmacro! cond (fn* (& xs) (if (> (count xs) 0) (list 'if (first xs) "
-        "(if (> (count xs) 1) (nth xs 1) (throw \"odd number of forms to "
-        "cond\")) (cons 'cond (rest (rest xs)))))))",
-        repl_env);
-    rep("(def! radians (fn* (deg) (* TAU (/ deg 360.))))", repl_env);
-    rep("(def! degrees (fn* (rad) (* 360. (/ rad TAU))))", repl_env);
-    rep("(defmacro! defn! (fn* (name args body) `(def! ~name (fn* ~args "
-        "~body))))",
-        repl_env);
+    // add "standard library" functions
+    for(int i = 0; i < NUM_RAL_STDLIB_FORMS; ++i) {
+        rep(RAL_STDLIB_FORMS[i], repl_env);
+    }
+
 }
 
 // this needs more work
